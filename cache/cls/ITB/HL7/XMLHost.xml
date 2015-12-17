@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.XMLHost">
+<Description>
+HL7 XML services common class</Description>
+<Super>Ens.Host</Super>
+<TimeCreated>63214,41248.268027</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Property name="TargetConfigNames">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Property name="SearchTableClass">
+<Type>%String</Type>
+<InitialExpression>"EnsLib.HL7.SearchTable"</InitialExpression>
+<Parameter name="MAXLEN" value="128"/>
+</Property>
+
+<Property name="MessageSchemaCategory">
+<Type>%String</Type>
+<InitialExpression>"2.5"</InitialExpression>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Parameter name="SETTINGS">
+<Default>SearchTableClass::selector?context={Ens.ContextSearch/SearchTableClasses?host=EnsLib.HL7.Service.Standard},MessageSchemaCategory:Basic:selector?context={Ens.ContextSearch/SchemaCategories?host=EnsLib.HL7.Service.Standard}</Default>
+</Parameter>
+</Class>
+</Export>

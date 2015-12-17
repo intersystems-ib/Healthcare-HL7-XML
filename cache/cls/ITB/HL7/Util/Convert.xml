@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.Util.Convert">
+<Description><![CDATA[
+HL7 ER7/XML convert methods
+<example>
+; ER7 -> XML
+set er7=##class(EnsLib.HL7.Message).ImportFromFile("C:\Test\HL7\OMG_O19.hl7")
+set xml=##class(ITB.HL7.Util.Convert).ER7ToXML(er7,.sc)
+w xml.Read()
+do xml.Rewind()
+; XML -> ER7
+set er7=##class(ITB.HL7.Util.Convert).XMLToER7(xml,.sc,"2.5")
+do er7.OutputToFile("C:\Test\HL7\File.hl7")
+</example>]]></Description>
+<IncludeCode>ITB</IncludeCode>
+<Super>Ens.Rule.FunctionSet</Super>
+<TimeCreated>63152,36548.620924</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Method name="ER7ToXML">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pER7:EnsLib.HL7.Message,&pSC,pCategory:%String="",pCode:%String="",pEvent:%String="",pStripNamespace:%Boolean=0]]></FormalSpec>
+<ReturnType>%Stream</ReturnType>
+<Implementation><![CDATA[
+	set ret = ##class(%GlobalCharacterStream).%New()
+	set pSC = $$$OK
+	try {
+		if pER7.DocType="" set pER7.DocType=..CalculateDocType(pER7, pCategory, pCode, pEvent)
+		if pER7.BuildMapStatus="" $$$THROWONERROR(tSC, pER7.BuildMap())
+		set ^||%itb("ER7ToXML","StripNamespace") = pStripNamespace
+		
+		#if $$$ITB32K
+			if pER7.FullSize < $$$CriticalMessageLen {
+				do ret.Write(pER7.OutputToString("", "", .pSC, "ITB.HL7.Format.HL7XMLv2"))
+			} else {
+				$$$ThrowOnError(pER7.OutputToLibraryStream(ret,"","","ITB.HL7.Format.HL7XMLv2"))
+			}
+		#else
+			$$$ThrowOnError(pER7.OutputToLibraryStream(ret,"","","ITB.HL7.Format.HL7XMLv2"))
+		#endif
+		
+	} catch ex {
+		set pSC = ex.AsStatus()
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="XMLToER7">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pXML:%Stream,&pSC,pCategory:%String=""]]></FormalSpec>
+<ReturnType>EnsLib.HL7.Message</ReturnType>
+<Implementation><![CDATA[
+	set ret = ""
+	try {
+		set ret = ##class(EnsLib.HL7.Message).ImportFromLibraryStream(pXML,.pSC,pCategory,"ITB.HL7.Format.HL7XMLv2")
+		if $$$ISERR(pSC) $$$ThrowStatus(pSC)
+	
+		set ret.DocType = ##class(ITB.HL7.Util.Convert).CalculateDocType(ret,pCategory)
+	} catch ex {
+		set pSC = ex.AsStatus()
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="CalculateDocType">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pMsg:EnsLib.HL7.Message,pCategory:%String="",pCode:%String="",pEvent:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set:pCategory="" pCategory=pMsg.GetValueAt("1:12")
+	set:pCode="" pCode=pMsg.GetValueAt("1:9.1")
+	set:pEvent="" pEvent=pMsg.GetValueAt("1:9.2")
+	
+	// look for Doctype in EnsHL7.Schema
+	set docType = $g(^EnsHL7.Schema(pCategory,"MT",pCode_"_"_pEvent))
+	
+	// handle ACK messages with no EnsHL7.Schema Doctype (e.g. OMG^O19)
+	if docType="",pCode="ACK" set docType=pCategory_":ACK"
+	
+	quit docType
+]]></Implementation>
+</Method>
+</Class>
+</Export>

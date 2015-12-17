@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.BO.TCPXMLOperation">
+<Description>
+Business Operation that receives an EnsLib.HL7.Message and sends it as HL7 (XML) 
+through TCP (MLLP) returning received ACK as EnsLib.HL7.Message</Description>
+<Super>ITB.HL7.BO.XMLOperation</Super>
+<TimeCreated>63214,37328.920277</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Parameter name="ADAPTER">
+<Default>ITB.TCP.FramedOutboundAdapter</Default>
+</Parameter>
+
+<Property name="Adapter">
+<Type>ITB.TCP.FramedOutboundAdapter</Type>
+</Property>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Method name="SendHL7">
+<Description>
+Send EnsLib.HL7.Message</Description>
+<FormalSpec>pRequest:EnsLib.HL7.Message,*pResponse:EnsLib.HL7.Message</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	
+	try {
+		$$$THROWONERROR(tSC, ..SendHL7XML(pRequest, .pResponse, 1))
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="AdapterSendStream">
+<Description>
+Send stream using Adapter (this method should be overwritten in derived operations)</Description>
+<FormalSpec>pRequest:%Stream.Object,*pResponse:%Stream.Object</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	quit ..Adapter.SendMessageStream(pRequest,.pResponse)
+]]></Implementation>
+</Method>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+	<MapItem MessageType="EnsLib.HL7.Message"> 
+		<Method>SendHL7</Method>
+	</MapItem>
+</MapItems>
+]]></Data>
+</XData>
+</Class>
+</Export>

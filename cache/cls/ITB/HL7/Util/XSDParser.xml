@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.Util.XSDParser">
+<Description><![CDATA[
+<p>Parse HL7 XML XSD structure files and generate Ensemble LookUp table to map group names<p>
+<ul>
+<li>Build ^||xsdparser with XSD structure</li>
+<li>Process ^||xsdparser comparing with ^EnsHL7.Schema</li>
+</ul>]]></Description>
+<Super>%XML.SAX.ContentHandler</Super>
+<TimeCreated>63151,73623.333426</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Parameter name="TABLEPREFIX">
+<Description>
+Prefix used in Lookup table names</Description>
+<Default>hl7_</Default>
+</Parameter>
+
+<Property name="Category">
+<Description>
+HL7 category</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="Structure">
+<Description>
+HL7 message structure</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="ComplexTypeLevel">
+<Description>
+complexType level</Description>
+<Type>%Integer</Type>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<Property name="SequenceLevel">
+<Description>
+sequence level</Description>
+<Type>%Integer</Type>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<Property name="ComplexTypeName">
+<Description>
+Current complexType name</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="Debug">
+<Description>
+Debug flag</Description>
+<Type>%Integer</Type>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<Method name="startElement">
+<Description>
+SAX. Start element</Description>
+<FormalSpec>uri:%Library.String,localname:%Library.String,qname:%Library.String,attrs:%Library.List</FormalSpec>
+<Implementation><![CDATA[
+ 	do ..ParseAttr(attrs,.namedattrs)
+	
+	if localname="complexType" set ..ComplexTypeLevel=..ComplexTypeLevel+1
+	if localname="sequence" set ..SequenceLevel=..SequenceLevel+1
+	
+	if ((localname="complexType") || (localname="element")) {
+		set name = $g(namedattrs("name"))
+		set ref = $g(namedattrs("ref"))
+		set type = $g(namedattrs("type"))
+		
+		if localname="complexType",name'="" {
+			set ..ComplexTypeName = name
+			set ^||xsdparser(..ComplexTypeName,"localname")=localname
+		}
+		
+		if ..ComplexTypeLevel=1,..SequenceLevel=1 {
+			set ^||xsdparser(..ComplexTypeName,$i(^||xsdparser(..ComplexTypeName)))=ref
+		}
+		
+		if ..ComplexTypeLevel=0,..SequenceLevel=0 {
+			set ^||xsdparser(name,"type")=type
+			set ^||xsdparser(name,"localname")=localname
+		}
+		
+		write:..Debug "[ct=",..ComplexTypeLevel," seq=",..SequenceLevel," ctn=",..ComplexTypeName,"] ln=",localname, " n=",name," "," r=",ref,!
+	}
+	
+	quit
+]]></Implementation>
+</Method>
+
+<Method name="endElement">
+<Description>
+SAX. End element</Description>
+<FormalSpec>uri:%Library.String,localname:%Library.String,qname:%Library.String</FormalSpec>
+<Implementation><![CDATA[
+ 	if localname="complexType" set ..ComplexTypeLevel=..ComplexTypeLevel-1
+	if localname="sequence" set ..SequenceLevel=..SequenceLevel-1
+]]></Implementation>
+</Method>
+
+<Method name="ParseAttr">
+<Description>
+Parse attributes and return a named list easier to handle</Description>
+<FormalSpec><![CDATA[attrs:%List,&namedattrs]]></FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	k namedattrs
+	for p=1:5:$ll(attrs) set namedattrs($lg(attrs,p+1))=$lg(attrs,p+4)
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ProcessContent">
+<Description>
+Process ^||xsdparser data and build LookUp tables</Description>
+<FormalSpec>ind:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	quit ..Process("",..Structure)
+]]></Implementation>
+</Method>
+
+<Method name="Process">
+<Description>
+Process ^||xsdparser recursively</Description>
+<FormalSpec>pInd:%String,pNode:%String,pXMLGroup:%String="",pEnsPath:%String="",pIncremented:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	try {
+		set increment = 0
+		set localname=$g(^||xsdparser(pNode,"localname"))
+		
+		if ..Debug {
+			write !,"==========================================",!
+			write pInd," ",pNode," ",pEnsPath," ",pXMLGroup,!
+		}
+		
+		// calculate next levels
+		set nelements=+$g(^||xsdparser(pNode))
+		set nextNodes = ""
+		write:..Debug ">leafs=",!
+		for i=1:1:nelements {
+			set element = $g(^||xsdparser(pNode,i))
+				
+			if '$data(^||xsdparser(element)) {
+				write:..Debug "  ",element,!
+			} else {
+				set nextNodes = nextNodes_$lb($lb(i,element))
+			}
+		}
+		set increment = ( (localname="complexType") && (nelements>1) )
+		
+		// avoid circular references
+		if $g(^||xsdparser(pNode,"processed")),$ll(nextNodes)>0 $$$ThrowStatus($$$ERROR($$$GeneralError,pNode_": circular reference!"))
+		set ^||xsdparser(pNode,"processed") = 1
+		
+		// calculate next levels (type)
+		set type = $g(^||xsdparser(pNode,"type"))
+		if type'="",$data(^||xsdparser(type)) {
+			set nextNodes = nextNodes_$lb($lb(1,type))
+		}
+		
+		if ..Debug {
+			write ">"
+			zwrite nextNodes
+		}
+		
+		// match Ensemble path / XML group name
+		if localname="element" {
+			set pXMLGroup=pNode
+			write:..Debug ">xmlgroup="_pXMLGroup,!
+			
+			set enspath = ""
+			if pInd'="" x ("(enspath) { set enspath=$g(^EnsHL7.Schema("""_..Category_""",""MS"","""_..Structure_""",""array"","_pInd_",""name"")) }", .enspath)
+			
+			write:..Debug ">enspath=",enspath,!
+			
+			if ((enspath["grp")||(enspath["union")) {
+				set enspath=$p(enspath,"(")
+				if pIncremented {
+					set pEnsPath=pEnsPath_$s(pEnsPath="":enspath,1:"."_enspath)
+				}
+				write:..Debug ">key=",pEnsPath,!
+				
+				// map Ensemble -> XML group name
+				set table=..#TABLEPREFIX_..Category, key=..Structure_"."_pEnsPath, value=pXMLGroup
+				set lookup=##class(Ens.Util.LookupTable).%OpenId(table_"||"_key,,.tSC)
+				if $$$ISERR(tSC) set lookup=##class(Ens.Util.LookupTable).%New()
+				set lookup.TableName = table
+				set lookup.KeyName = key
+				set lookup.DataValue = $select($l(lookup.DataValue):lookup.DataValue_"," , 1:"")_value
+				$$$THROWONERROR(tSC, lookup.%Save())
+			}
+		}
+		
+		// go into next levels
+		for i=1:1:$listlength(nextNodes) {
+			set tmpInd = $lg($lg(nextNodes,i),1)
+			set nextInd=pInd
+			set nextNode = $lg($lg(nextNodes,i),2)
+			
+			if nextInd="",increment {
+				set nextInd=tmpInd
+			}
+			elseif nextInd'="",increment {
+				set nextInd=nextInd_","_tmpInd 
+			}
+			
+			$$$THROWONERROR(tSC, ..Process(nextInd, nextNode, pXMLGroup, pEnsPath, increment))
+		}
+	} catch ex {
+		set ret = ex.AsStatus()
+		write $system.Status.GetOneErrorText(ret),!
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="LoadFile">
+<Description>
+Parse a given HL7 message structure XSD file and build LookUp tables to map Ensemble and HL7 XML group names</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCategory="2.5",pPath="c:\hl7\hl7_xml-2.5\",pFile="OMG_O19.xsd",pDebug=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	try {
+		set structure = $piece(pFile,".")
+		
+		set handler=..%New()
+		set handler.Structure = structure
+		set handler.Category = pCategory
+		set handler.Debug = pDebug
+		
+		kill ^||xsdparser, ^xsdparser
+		$$$THROWONERROR(tSC, ##class(%XML.SAX.Parser).ParseFile(pPath_pFile,handler))
+		merge ^xsdparser = ^||xsdparser
+		$$$THROWONERROR(tSC, handler.ProcessContent())
+	} catch ex {
+		set ret = ex.AsStatus()
+		write $system.Status.GetOneErrorText(ret),!
+	}
+    quit ret
+]]></Implementation>
+</Method>
+
+<Method name="LoadDirectory">
+<Description>
+Parse all "*_*.xsd" HL7 message XSD files within a given directory </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCategory="2.5",pPath="c:\hl7\hl7_xml-2.5\",pDebug=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	write "Clearing Lookup Table: "_..#TABLEPREFIX_pCategory,!
+	do ##class(Ens.Util.LookupTable).%ClearTable(..#TABLEPREFIX_pCategory)
+	
+	write "Processing files...",!
+	set tRS = ##class(%ResultSet).%New("%File:FileSet")
+	set sc = tRS.Execute(pPath,"*_*.xsd")
+ 	while (tRS.Next()) {        
+ 		set filename = tRS.Data("Name")
+        do ..LoadFile(pCategory, pPath, ##class(%File).GetFilename(filename), pDebug) 
+ 	}
+ 	write "Done.",!
+ 	
+ 	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

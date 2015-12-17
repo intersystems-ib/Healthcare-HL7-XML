@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.BS.SOAPXMLService">
+<Description>
+WebService that receives HL7 (XML) and sends it as EnsLib.HL7.Message 
+to targets returning the corresponding Ack (XML) to source.
+Override and modify this service as needed.</Description>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>EnsLib.SOAP.Service,ITB.HL7.BS.XMLService</Super>
+<TimeCreated>63427,53806.128498</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Parameter name="SERVICENAME">
+<Description>
+The SOAP name of this service.</Description>
+<Default>HL7SOAPXMLService</Default>
+</Parameter>
+
+<Parameter name="NAMESPACE">
+<Description>
+SOAP Namespace for the WebService</Description>
+<Default>http://tempuri.org</Default>
+</Parameter>
+
+<Method name="AcceptMessage">
+<Description>
+acceptMessage</Description>
+<FormalSpec>input:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<WebMethod>1</WebMethod>
+<Implementation><![CDATA[
+	set output=""
+	try {
+		$$$THROWONERROR(tSC,..OnProcessInput(input, .output))
+	} catch ex {
+		set tSC = ex.AsStatus()
+		$$$LOGERROR(##class(%SYSTEM.Status).GetOneErrorText(tSC))
+	}
+	quit output
+]]></Implementation>
+</Method>
+
+<Method name="OnProcessInput">
+<Description>
+Override this method to process incoming data. Do not call SendRequestSync/Async() from outside this method (e.g. in a SOAP Service or a CSP page).</Description>
+<FormalSpec><![CDATA[pInput:%RegisteredObject,*pOutput:%RegisteredObject,&pHint:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	set pOutput=""
+	try {
+		// string to stream
+		set pInputStream = ##class(%Stream.GlobalCharacter).%New()
+		do pInputStream.Write($zcvt(pInput,"O","UTF8"))
+		
+		// convert incoming HL7 (xml) to ER7
+		set tOutput = ##class(%Stream.GlobalCharacter).%New()
+		set tSC = ..StreamProcessInput(pInputStream, .tOutput, 1, 1, .tReqER7)
+		if $$$ISERR(tSC) $$$ThrowStatus(tSC)
+		
+		// ack
+		if $isobject(tOutput) {
+			set pOutput=tOutput.Read()
+		}
+	} catch ex {
+		set ret = ex.AsStatus()
+		$$$LOGERROR(##class(%SYSTEM.Status).GetOneErrorText(ret))
+	}
+	quit ret
+]]></Implementation>
+</Method>
+</Class>
+</Export>

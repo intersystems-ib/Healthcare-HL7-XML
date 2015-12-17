@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.TCP.FramedCommon">
+<Description>
+Common class for inbound and outbound framed adapters</Description>
+<Abstract>1</Abstract>
+<ClassType/>
+<IncludeCode>%occInclude,Ensemble</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>EnsLib.TCP.CountedCommon</Super>
+<TimeCreated>63207,52748.941304</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Property name="PrefixChar">
+<Description>
+Frame Prefix Character (ASCII code)</Description>
+<Type>%String</Type>
+<InitialExpression>"11"</InitialExpression>
+</Property>
+
+<Property name="SuffixChar">
+<Description>
+Frame Suffix Character (ASCII code)</Description>
+<Type>%String</Type>
+<InitialExpression>"28,13"</InitialExpression>
+</Property>
+
+<Property name="Prefix">
+<Description>
+Frame Preffix</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="Suffix">
+<Description>
+Frame Suffix</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="TempBufSize">
+<Description>
+Temporal Buffer Size</Description>
+<Type>%String</Type>
+<InitialExpression>32000</InitialExpression>
+</Property>
+
+<Property name="UseFileStream">
+<Description>
+Should the adapter construct a FileStream or a GlobalStream for data received?</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Method name="ReadFramedStream">
+<Description>
+Read data from the TCP socket into the Stream using a Charset for translation</Description>
+<FormalSpec><![CDATA[&pStream:%CharacterStream="",pCharset:%String="",pStartTimeout:%Numeric=-1,pTimeout:%Numeric=60,pInbound:%Boolean=0]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	
+	try {
+		// switch to RAW input mode
+		do SetIO^%NLS("RAW")
+	
+		// instantiate output Stream object	
+		if pInbound,'$IsObject(pStream) do ..CreateStream(.pStream, pCharset)
+		$$$ASSERT($IsObject(pStream))
+		
+		// create temporary Stream for temp writes
+		set tStream = ##class(%FileCharacterStream).%New()  $$$ASSERT($IsObject(tStream))
+		set tStream.TranslateTable = "RAW" 		; avoid data translation for temp writes
+		set tStream.StreamFormatWrite = 0 		; ensure writes to the stream don't convert $c(13,10) to $c(10)
+		set tStream.TranslateTable = ##class(%IO.I.TranslationDevice).GetCharEncodingTable(pCharset)
+		
+		// read TCP framed data
+		set ok=0
+		if '$l(..Prefix) set ok=1
+		set buffer="",zh=$zh
+		for  {
+			read *x:pTimeout
+			if x=-1	$$$ThrowStatus($$$ERROR($$$EnsErrTCPReadTimeoutExpired,pTimeout,pCharset))
+			if 'ok,$find(..Prefix,$char(x)) set ok=1
+			if 'ok $$$TRACE("Wait for "_..Prefix_" but received "_$char(x))
+			if ok { 
+				set buffer=buffer_$char(x)
+				if $l(buffer)>..TempBufSize {
+					do tStream.Write(buffer)
+					set buffer=""
+				}
+			}
+			if $find(..Suffix,$char(x)) quit
+			if ($zh-zh)>pTimeout $$$ThrowStatus($$$ERROR($$$EnsErrTCPReadTimeoutExpired,pTimeout,pCharset))
+		}
+		
+		// copy data to output Stream and remove frame prefix and suffix
+		do tStream.Write($tr($tr(buffer,..Prefix,""),..Suffix,""))
+		while 'tStream.AtEnd {
+			set buffer = tStream.Read()
+			do pStream.Write($tr($tr(buffer,..Prefix,""),..Suffix,""))
+		}
+		
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="WriteFramedStream">
+<Description>
+Write the stream contents as on the TCP socket</Description>
+<FormalSpec>pStream:%Stream.Object,pCharset:%String="",pInbound:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	
+	try {
+		do {
+			set tTable = ##class(%IO.I.TranslationDevice).GetCharEncodingTable(pCharset)
+			//do SetIO^%NLS("RAW")
+
+			if "RAW"=tTable {
+				write ..Prefix
+				$$$THROWONERROR(tSC, pStream.OutputToDevice())
+				write ..Suffix
+			} 
+			else {
+				// use 8k chunks to allow up to 4x expansion in $zcvt
+				set tLen=0,tLeft=pStream.Size,tMaxChunk=$$$GetClassParameter("%Library.FileCharacterStream","MAXLOCALSIZE")\4
+				for iChunk=1:1 {
+					set tChunkSize = $select(tLeft>tMaxChunk:tMaxChunk,1:tLeft)
+					set ^||EnsWCSChunk(iChunk) = $zcvt(pStream.Read(tChunkSize),"O",tTable), tLen=tLen+$L(^||EnsWCSChunk(iChunk))
+					set tLeft = tLeft-tChunkSize  quit:tLeft'>0
+				}
+				$$$catTRACE("protocol","Converted("_pStream.Size_") characters to ("_tLen_") output bytes using charset '"_pCharset_"', table '"_tTable_"'")
+		
+				write ..Prefix
+				for i=1:1:iChunk write ^||EnsWCSChunk(i)
+				write ..Suffix
+			}
+			write *-3 // flush buffer
+			
+		} while(0)
+		
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="CreateStream">
+<Description>
+Create a Stream object </Description>
+<FormalSpec><![CDATA[&pStream:%CharacterStream,pCharset:%String]]></FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+	if ""'=pStream set pStream=$classmethod(pStream,"%New")
+	
+	// Binary charset
+	if "binary"=$zcvt(pCharset,"L") {
+		if ..UseFileStream { 
+			set pStream=##class(%FileBinaryStream).%New() 
+		}
+		else { 
+			set pStream=##class(%GlobalBinaryStream).%New()
+		}
+	}
+	// Other charset 
+	else {
+		if ..UseFileStream {
+			set pStream=##class(%FileCharacterStream).%New()
+			set pStream.TranslateTable="UnicodeLittle", pStream.BOM=""
+		} 
+		else {
+			set pStream=##class(%GlobalCharacterStream).%New()
+		}
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PrefixCharSet">
+<Description>
+Preffix Setter</Description>
+<FormalSpec>pValue:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set i%PrefixChar = pValue
+	set i%Prefix = ..GetChars(pValue)
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="SuffixCharSet">
+<Description>
+Suffix Setter</Description>
+<FormalSpec>pValue:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set i%SuffixChar = pValue
+	set i%Suffix = ..GetChars(pValue)
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetChars">
+<Description>
+Returns a string built from a given comma separated list (e.g. "28,13")</Description>
+<FormalSpec>pValue</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set ret = ""	
+	for i=1:1:$l(pValue,",") {
+		set ret = ret_$c($p(pValue,",",i))	
+	}
+	quit ret
+]]></Implementation>
+</Method>
+</Class>
+</Export>

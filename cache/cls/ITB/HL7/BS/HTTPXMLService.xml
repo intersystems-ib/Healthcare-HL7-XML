@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.BS.HTTPXMLService">
+<Description>
+Business Service that reads a HL7 (XML) sent over HTTP and sends it as EnsLib.HL7.Message to targets</Description>
+<Super>ITB.HL7.BS.XMLService</Super>
+<TimeCreated>63242,39319.032307</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.HTTP.InboundAdapter</Default>
+</Parameter>
+
+<Property name="ContentType">
+<Description>
+Content Type used to send the HTTP content</Description>
+<Type>%String</Type>
+<InitialExpression>"application/hl7-v2+xml"</InitialExpression>
+</Property>
+
+<Parameter name="SETTINGS">
+<Default><![CDATA[ContentType,UseAckCommitCodes,TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},BadMessageHandler:Basic:selector?context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},XMLInputHandler:Basic:selector?context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},SearchTableClass::selector?context={Ens.ContextSearch/SearchTableClasses?host=EnsLib.HL7.Service.Standard},MessageSchemaCategory:Basic:selector?context={Ens.ContextSearch/SchemaCategories?host=EnsLib.HL7.Service.Standard},AlertGracePeriod:Alerting]]></Default>
+</Parameter>
+
+<Method name="OnProcessInput">
+<FormalSpec>pInput:%Stream.Object,*pOutput:%Stream.Object</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	
+	try {
+		$$$THROWONERROR(tSC, ..StreamProcessInput(pInput, .pOutput, 1))
+		set pOutput.Attributes("ResponseCode") = "200 OK"
+		set pOutput.Attributes("Content-Type") = ..ContentType
+	} catch ex {
+		set ret = ex.AsStatus()
+		do pOutput.Clear()
+		set pOutput.Attributes("ResponseCode")="500 ServerError"
+	}
+	
+	quit ret
+]]></Implementation>
+</Method>
+</Class>
+</Export>

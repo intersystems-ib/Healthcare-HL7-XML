@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.Task.PurgeNACK">
+<Description>
+System task to purge NACK messages that reference non-existing Ens.MessageHeader</Description>
+<Super>%SYS.Task.Definition</Super>
+<TimeCreated>63446,69405.23614</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id: //custom_ccrs/_common/tools/Iberia/ITB/latest/cls/ITB/Task/PurgeNACK.xml#1 $</Default>
+</Parameter>
+
+<Parameter name="TaskName">
+<Default>ITB.Task.PurgeNACK</Default>
+</Parameter>
+
+<Method name="OnTask">
+<Description>
+The OnTask() method is called to execute the task</Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	try {
+		do ..Log("=====================================")
+		do ..Log("*PurgeNACK Begin")
+		$$$ThrowOnError(..DeleteNACKTask())
+		do ..Log("*PurgeNACK End")
+	} catch ex {
+		set ret = ex.AsStatus()
+		do ..Log("<ERROR> OnTask: "_$system.Status.GetOneErrorText(ret))
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="DeleteNACKTask">
+<Description>
+Loop over NACK table and delete any entry that references a non-existing Ens.MessageHeader (OriginalId)</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	try {
+		set (ntotal, ndeleted) = 0
+		set originalId = ""
+		&sql(
+		DECLARE cNack CURSOR FOR
+		SELECT OriginalId INTO :originalId FROM ITB_HL7_Data.NACK 
+		)
+		&sql(OPEN cNack)
+		for {
+			&sql(FETCH cNack)
+			quit:(SQLCODE'=0)
+			set ntotal = ntotal + 1
+			
+			// check if originalId references non-existing message
+			if '$data(^Ens.MessageHeaderD(originalId)) {
+				&sql(DELETE FROM ITB_HL7_Data.NACK WHERE OriginalId=:originalId)
+				if SQLCODE'=0 $$$ThrowStatus($$$ERROR($$$GeneralError, "Error while deleting ITB_HL7_Data.NACK id="_originalId)) 
+				set ndeleted = ndeleted + %ROWCOUNT
+			}
+		}
+		&sql(CLOSE cNack)
+		do ..Log("Total="_ntotal_", Deleted="_ndeleted_$$$NL)
+	} catch ex {
+		set ret = ex.AsStatus()
+		do ..Log("<ERROR> DeleteNACKTask: "_$system.Status.GetOneErrorText(ret))
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="Log">
+<Description>
+Log a text message</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pText:%String,&pInfo]]></FormalSpec>
+<Implementation><![CDATA[
+	set tText = $zdt($h,3)_": "_pText
+	write !,tText
+	zwrite:$d(pInfo) pInfo
+]]></Implementation>
+</Method>
+</Class>
+</Export>

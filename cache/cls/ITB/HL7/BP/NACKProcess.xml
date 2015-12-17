@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.BP.NACKProcess">
+<Description>
+</Description>
+<ClassType>persistent</ClassType>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>Ens.BusinessProcess</Super>
+<TimeCreated>63243,37129.698471</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Property name="Target">
+<Description>
+Name of production element that sent the original HL7 message</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
+<Property name="NACKCodes">
+<Description>
+Comma separated list of NACK Codes that will be considered errors</Description>
+<Type>%String</Type>
+<InitialExpression>"AE"</InitialExpression>
+</Property>
+
+<Property name="AllowDuplicates">
+<Description>
+Allow more than one error entry (NACK) with the same MSHCControlID and Target.</Description>
+<Type>%Boolean</Type>
+<InitialExpression>"0"</InitialExpression>
+</Property>
+
+<Property name="SearchTableClass">
+<Type>%String</Type>
+<InitialExpression>"EnsLib.HL7.SearchTable"</InitialExpression>
+<Parameter name="MAXLEN" value="128"/>
+</Property>
+
+<Parameter name="SETTINGS">
+<Default>NACKCodes,Target,SearchTableClass::selector?context={Ens.ContextSearch/SearchTableClasses?host=EnsLib.HL7.Service.Standard},-ThrottleDelay,ReplyCodeActions,RetryInterval,AlertRetryGracePeriod:Alerting,FailureTimeout,QueueCountAlert:Alerting,QueueWaitAlert:Alerting</Default>
+</Parameter>
+
+<Method name="OnRequest">
+<Description>
+Handle a 'Request'</Description>
+<FormalSpec>request:%Library.Persistent,*response:%Library.Persistent</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	try {
+		set tNumRows="", tIdList=""
+		set tSC = ##class(ITB.HL7.Data.NACK).InsertError(..%PrimaryRequestHeader, request, ..Target, ..NACKCodes, ..SearchTableClass, ..AllowDuplicates, .tNumRows, .tIdList)
+		do ..AfterInsertError(request, tSC, tNumRows, tIdList)
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="AfterInsertError">
+<Description>
+Method that will be executed after calling ##class(ITB.HL7.Data.NACK).InsertError.
+Can be overriden and be used to add specific behaviour (e.g: generate an alert with some content from ERR segment of pRequest).
+request: Message (NACK) received by Business Process.
+tSC: Status code returned by ##class(ITB.HL7.Data.NACK).InsertError.
+pNumRows: Number of rows inserted in ITB.HL7.Data.NACK.
+pIdList: List with IDs inserted in ITB.HL7.Data.NACK.</Description>
+<FormalSpec>request:EnsLib.HL7.Message,tSC:%Status,pNumRows:%String,pIdList:%ListOfDataTypes</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	try {
+		// add your custom code here
+	} catch ex {
+		set ret = ex.AsStatus()
+		$$$LOGERROR($system.Status.GetOneErrorText(ret))
+	}
+	quit ret
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DefaultData>NACKProcessDefaultData</DefaultData>
+<Data name="NACKProcessDefaultData">
+<Subscript>"NACKProcess"</Subscript>
+<Value name="1">
+<Value>Target</Value>
+</Value>
+<Value name="2">
+<Value>NACKCodes</Value>
+</Value>
+<Value name="3">
+<Value>SearchTableClass</Value>
+</Value>
+<Value name="4">
+<Value>AllowDuplicates</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

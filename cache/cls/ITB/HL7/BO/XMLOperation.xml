@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITB.HL7.BO.XMLOperation">
+<Description>
+HL7 XML operations common class</Description>
+<Super>ITB.HL7.BO.XMLReplyStandard</Super>
+<TimeCreated>63214,40087.163372</TimeCreated>
+
+<Parameter name="SrcVer">
+<Description>
+Location and Revision of this file in Perforce (Auto-updating)</Description>
+<Default>$Id$</Default>
+</Parameter>
+
+<Property name="NACKControl">
+<Description>
+Enable NACK control. A SearchTable MUST be used. Configure a Service to receive async NACK messages and process them in ITB.HL7.BP.NACKProcess</Description>
+<Type>%Boolean</Type>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<Property name="StripNamespace">
+<Description>
+Strip namespace in HL7 XML.</Description>
+<Type>%Boolean</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Parameter name="SETTINGS">
+<Default>StripNamespace,NACKControl,SearchTableClass::selector?context={Ens.ContextSearch/SearchTableClasses?host=EnsLib.HL7.Service.Standard},MessageSchemaCategory:Basic:selector?context={Ens.ContextSearch/SchemaCategories?host=EnsLib.HL7.Service.Standard}</Default>
+</Parameter>
+
+<Method name="SendHL7XML">
+<Description>
+Send EnsLib.HL7.Message as XML</Description>
+<FormalSpec>pRequest:EnsLib.HL7.Message,*pResponse:EnsLib.HL7.Message,pGetAck:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ret = $$$OK
+	
+	try {
+		if pRequest.DocType="" {
+			set pRequest.DocType = ##class(ITB.HL7.Util.Convert).CalculateDocType(pRequest,..MessageSchemaCategory)
+		}
+		
+		// index HL7 in SearchTable
+		if ..SearchTableClass'="" {
+			set tSC = $zobjclassmethod(..SearchTableClass,"IndexDoc",pRequest)
+			if $$$ISERR(tSC) $$$LOGERROR("SearchTableClass Error: "_##class(%SYSTEM.Status).GetErrorText(tSC))
+		}
+		
+		// convert EnsLib.HL7.Message to XML
+		set tXML = ##class(ITB.HL7.Util.Convert).ER7ToXML(pRequest,.tSC,..MessageSchemaCategory,,,..StripNamespace)
+		if $$$ISERR(tSC) $$$ThrowStatus(tSC)
+		
+		// send XML through adapter
+		set tAckXML = ##class(%Stream.GlobalCharacter).%New()
+		$$$THROWONERROR(tSC, ..AdapterSendStream(tXML,.tAckXML))
+		
+		if pGetAck {
+			// show received XML
+			$$$TRACE(tAckXML.Read())
+			do tAckXML.Rewind()
+			
+			// convert received XML ack to ER7
+			set tReplyDoc = ##class(ITB.HL7.Util.Convert).XMLToER7(tAckXML,.tSC,..MessageSchemaCategory)
+			if $$$ISERR(tSC) $$$ThrowStatus(tSC)
+			
+			set tReplyDoc.OriginalDocId=pRequest.%Id()
+			set tReplyTypeName=tReplyDoc.Name, tReplyCategory=$s(""'=pRequest.MessageTypeCategory:pRequest.MessageTypeCategory,1:$P(pRequest.DocType,":"))
+			
+			do ##class(EnsLib.HL7.Schema).ResolveReplyNameAndDocType(tReplyCategory_":"_pRequest.Name,.tReplyDocName,.tReplyDocType,0)
+			$$$TRACE("Got reply message "_tReplyDoc_" of type "_tReplyTypeName_$S(tReplyTypeName=tReplyDocName:"",1:", expected type "_tReplyDocName))
+			set tReplyDoc.IsMutable=0
+			kill ..%ActionHint  Set ..%ActionHint("AckType")=tReplyTypeName, ..%ActionHint("ReplyDocName")=tReplyDocName, ..%ActionHint("MsgType")="HL7"
+			
+			set pResponse = tReplyDoc
+		}
+		
+		if ..NACKControl {
+			set tSC = ##class(ITB.HL7.Data.NACK).RemoveError(pRequest,..%RequestHeader.TargetConfigName)
+		}
+		
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	
+	quit ret
+]]></Implementation>
+</Method>
+
+<Method name="AdapterSendStream">
+<Description>
+Send stream using Adapter (this method should be overwritten in derived operations)</Description>
+<FormalSpec>pRequest:%Stream.Object,*pResponse:%Stream.Object</FormalSpec>
+<ReturnType>%Status</ReturnType>
+</Method>
+
+<Method name="OnGetConnections">
+<Description>
+Return an array of connections for drawing lines on the config diagram</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*pArray:%String,pItem:Ens.Config.Item</FormalSpec>
+<Implementation><![CDATA[
+	do ##super(.pArray,pItem)
+	if pItem.GetModifiedSetting("TargetConfigNames",.tValue) {
+		for i=1:1:$L(tValue,",") { 
+			set tOne=$zstrip($p(tValue,",",i),"<>W")
+			continue:""=tOne
+			set pArray(tOne)="" 
+		}
+	}
+]]></Implementation>
+</Method>
+</Class>
+</Export>
