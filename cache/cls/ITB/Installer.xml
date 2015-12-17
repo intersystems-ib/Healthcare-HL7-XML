@@ -178,7 +178,7 @@ Check installation</Description>
 <Method name="Uninstall">
 <Description>
 Uninstalls ITB.
-*WARNING* it actually deletes classes!</Description>
+*WARNING* it actually deletes classes!!</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
