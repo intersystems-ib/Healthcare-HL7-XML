@@ -1,0 +1,32 @@
+^MAC^Save for Source Control^^~Format=Cache.S~^UTF8
+%RO
+ccrRefresh^MAC^^^0
+ #include %occInclude
+ 
+PreRefresh(pPrompt = 0) public {
+	set ret = $$$OK
+	try {
+		$$$ThrowOnError(##class(ITB.Installer).Uninstall())
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	quit ret
+}
+.
+.
+PostRefresh(pPrompt = 0) public {
+	set ret = $$$OK
+	try {
+		$$$ThrowOnError(##class(ITB.Installer).Run(^Sources))
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	quit ret
+}
+ 
+ 
+.
+.
+
+
+
