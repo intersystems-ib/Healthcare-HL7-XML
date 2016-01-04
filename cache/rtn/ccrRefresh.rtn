@@ -6,6 +6,7 @@ ccrRefresh^MAC^^^0
 PreRefresh(pPrompt = 0) public {
 	set ret = $$$OK
 	try {
+		// refreshing from source control files, complete uninstall ITB on namespace.
 		$$$ThrowOnError(##class(ITB.Installer).Uninstall())
 	} catch ex {
 		set ret = ex.AsStatus()
@@ -17,6 +18,7 @@ PreRefresh(pPrompt = 0) public {
 PostRefresh(pPrompt = 0) public {
 	set ret = $$$OK
 	try {
+		// install ITB from source control files.
 		$$$ThrowOnError(##class(ITB.Installer).Run(^Sources))
 	} catch ex {
 		set ret = ex.AsStatus()
