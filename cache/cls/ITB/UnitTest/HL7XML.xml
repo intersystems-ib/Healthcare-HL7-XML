@@ -66,13 +66,22 @@ HL7 ER7 to XML conversions</Description>
 		do $$$AssertEquals(sc, 1, er7name_": reference HL7 XML file exists")
 		
 		// read reference HL7 XML file
-		// -> as HL7 XML files were created in Windows, handle LineTerminator conversions if is a Unix
 		set xmlfile = ##class(%Stream.FileCharacter).%New()
 		set xmlfile.Filename = xmlpath
+		// -> as HL7 XML files were created in Windows, handle LineTerminator conversions if is a Unix
 		if $$$isUNIX {
 			set tmp = ##class(%Stream.GlobalCharacter).%New()
 			while 'xmlfile.AtEnd {
 				set buf = $replace(xmlfile.Read(),$c(13,10),$c(10))
+				do tmp.Write(buf)
+			}
+			set xmlfile = tmp
+		}
+		// -> handle line terminator differences when using files downloaded from source code repo. 
+		else {
+			set tmp = ##class(%Stream.GlobalCharacter).%New()
+			while 'xmlfile.AtEnd {
+				set buf = $replace(xmlfile.Read(),$c(10),$c(13,10))
 				do tmp.Write(buf)
 			}
 			set xmlfile = tmp
