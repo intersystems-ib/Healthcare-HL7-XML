@@ -147,12 +147,7 @@ Base Release: Rajiv Bhatia</Description>
 		// this deals with single or repeating values without subtypes
 		for r=1:1:rCnt {
 			Set rAlias=i_"("_r_")"
-			
-			//ITB+
-			set tTag2=$piece($lg($lg($$$vaSchemaGbl(iCat,"SS",tName),i)),":",2)
-			if tTag2'="",tTag2'["@",..IsDTSimple(iCat,tTag2) set tTag2=""
-			//ITB-
-			
+			set tTag2=$piece($lg($lg(^EnsHL7.Schema(iCat,"SS",tName),i)),":",2)
 			continue:tTag2'=""
 			Continue:""=pSegObj.GetValueAt(rAlias)
 			
@@ -161,11 +156,7 @@ Base Release: Rajiv Bhatia</Description>
 		// this loop deals with datatypes
 		For r=1:1:rCnt {
 			Set rAlias=i_"("_r_")"
-			
-			//ITB+
-			set tTag2=$piece($lg($lg($$$vaSchemaGbl(iCat,"SS",tName),i)),":",2)
-			if tTag2'="",tTag2'["@",..IsDTSimple(iCat,tTag2) set tTag2=""
-			//ITB-
+			set tTag2=$piece($lg($lg(^EnsHL7.Schema(iCat,"SS",tName),i)),":",2)
 			
 			//ITB+
 			// Segments with datastructure like "@i": will take datastructure definition from "i" field in segment
@@ -173,9 +164,8 @@ Base Release: Rajiv Bhatia</Description>
 				set tField = $piece(tTag2,"@",2)
 				set tDS = ..UnescapeXML(pSegObj.GetValueAt(tField),pSegObj.Separators)
 				set tTag2 = $select($length(tDS):tDS, 1:"")
-				
-				// if no datastructure (only one node) or it does not exist, write field value "as is".
-				if ((tTag2="")||(..IsDTSimple(iCat,tTag2))) {
+				// if no datastructure or it does not exist, write field value "as is".
+				if ((tTag2="")||('$d(^EnsHL7.Schema(iCat,"DS",tTag2)))) {
 					do ..WriteSegmentField(pIOStream, pSegObj, rAlias, .pStatus) Quit:$$$ISERR(pStatus)
 					continue
 				}
@@ -184,7 +174,7 @@ Base Release: Rajiv Bhatia</Description>
 			
 			continue:tTag2=""
 			Continue:""=pSegObj.GetValueAt(rAlias)
-			set tRepeating=$lg($lg($$$vaSchemaGbl(iCat,"SS",tName),i),2)
+			set tRepeating=$lg($lg(^EnsHL7.Schema(iCat,"SS",tName),i),2)
 
 			Set cCnt=pSegObj.GetValueAt(i_"("_r_").*")
 			if cCnt>1 {
@@ -193,10 +183,7 @@ Base Release: Rajiv Bhatia</Description>
 	
 			For c=1:1:cCnt {
 				Set cAlias=rAlias_"."_c
-				//ITB+
-				set tTag3=$Select($D($$$vaSchemaGbl(iCat,"DT",$piece(tTag2,"."))):$piece($lg($lg($$$vaSchemaGbl(iCat,"DT",$piece(tTag2,".")),c)),":",2),1:$piece($lg($$$vaSchemaGbl(iCat,"DS",$piece(tTag2,".")),c),":",2))
-				if tTag3'="",..IsDTSimple(iCat,tTag3) set tTag3=""
-				//ITB-
+				set tTag3=$piece($lg(^EnsHL7.Schema(iCat,"DS",$piece(tTag2,".")),c),":",2)				
 				Continue:""=pSegObj.GetValueAt(cAlias,pSeparators)
 				If (tTag3'="") {
 						Set sCnt=pSegObj.GetValueAt(cAlias_".*",pSeparators)
@@ -204,10 +191,7 @@ Base Release: Rajiv Bhatia</Description>
 						Do pIOStream.Write(tIndent_"<"_tNS_tTag2_"."_c_">",,.pStatus)  Quit:$$$ISERR(pStatus)
 
 						// last loop is many items or subcomponents
-						//ITB+
-						set tTag4=$Select($D($$$vaSchemaGbl(iCat,"DT",$piece(tTag3,"."))):$piece($lg($lg($$$vaSchemaGbl(iCat,"DT",$piece(tTag3,".")))),":",2),1:$piece($lg($$$vaSchemaGbl(iCat,"DS",$piece(tTag3,".")),1),":",2))	
-						if tTag4'="",..IsDTSimple(iCat,tTag4) set tTag4=""
-						//ITB-
+						set tTag4=$piece($lg(^EnsHL7.Schema(iCat,"DS",$piece(tTag3,".")),1),":",2)	
 						
 						if (tTag4'="") {
 							set tTag3=$piece(tTag3,".")_"."_1
@@ -241,10 +225,10 @@ Base Release: Rajiv Bhatia</Description>
 						}
 				}
 				else {
-						set tTag3=$piece(tTag2,".")_"."_c
+						set tTag3=$piece(tTag2,".")_"."_c					
 						Do pIOStream.Write(tIndent_"<"_tNS_tTag3_">",,.pStatus)  Quit:$$$ISERR(pStatus)
 						do ..WriteSegmentField(pIOStream, pSegObj, cAlias, .pStatus) Quit:$$$ISERR(pStatus)
-						Do pIOStream.Write(tClosingIndent_"</"_tNS_tTag3_">",,.pStatus)  Quit:$$$ISERR(pStatus)
+				Do pIOStream.Write(tClosingIndent_"</"_tNS_tTag3_">",,.pStatus)  Quit:$$$ISERR(pStatus)
 				}			
 	
 			} Quit:$$$ISERR(pStatus)
@@ -377,10 +361,10 @@ Base Release: Rajiv Bhatia</Description>
 	if localname[":" set localname=$piece(localname,":",2)
 	
 	set tSchema=$get(..%Context("Schema"))
-	If $data($$$vaSchemaGbl(tSchema,"MT",localname)) {
+	If $data(^EnsHL7.Schema(tSchema,"MT",localname)) {
 		Do:$IsObject(..%DocObj) ..fault("More than one message found in stream")
 		Set ..%DocObj=##class(EnsLib.HL7.Message).%New()
-	} ElseIf $data($$$vaSchemaGbl(tSchema,"SS",localname)) {
+	} ElseIf $data(^EnsHL7.Schema(tSchema,"SS",localname)) {
 		if (localname="MSH") {
 			set ..%SegObj=..%DocObj.getSegmentByIndex(1)
 		}
@@ -396,10 +380,10 @@ Base Release: Rajiv Bhatia</Description>
 		Set ..%SegFields=0
 		Set ..%Content=""
 		set ..%FieldPath=""
-	} ElseIf ($data($$$vaSchemaGbl(tSchema,"SS",$piece(localname,".")))&&(+$piece(localname,".",2)>0)) {
+	} ElseIf ($data(^EnsHL7.Schema(tSchema,"SS",$piece(localname,".")))&&(+$piece(localname,".",2)>0)) {
 		set ..%SegFields=$piece(localname,".",2)
 		// schema defines more than one item per field
-		if ("+*"[$lg($lg($$$vaSchemaGbl(tSchema,"SS",..%SegObj.Name),..%SegFields),2)) {
+		if ("+*"[$lg($lg(^EnsHL7.Schema(tSchema,"SS",..%SegObj.Name),..%SegFields),2)) {
 			if (..%SegFields > ..%LastLevel)
 				{
 					set ..%FieldPath=""
@@ -415,7 +399,7 @@ Base Release: Rajiv Bhatia</Description>
 			Set ..%FieldPath=..%SegFields
 		}
 		Set ..%Content=""
-	} Elseif ($data($$$vaSchemaGbl(tSchema,"DT",$piece(localname,"."))) || $data($$$vaSchemaGbl(tSchema,"DS",$piece(localname,"."))))  {
+	} Elseif ($data(^EnsHL7.Schema(tSchema,"DS",$piece(localname,"."))))  {
 		/*if ($lg(^EnsHL7.Schema(tSchema,"DS",$piece(localname,".")),$piece(localname,".",2))="")&&($piece(localname,".",2)>1) {
 			set tLength=1
 			if $length(..%FieldPath,".")>1 set tLength=$length(..%FieldPath,".")-1
@@ -439,9 +423,9 @@ Base Release: Rajiv Bhatia</Description>
 	
 	set tSchema=$get(..%Context("Schema"))
 	
-	If $data($$$vaSchemaGbl(tSchema,"MT",$piece(localname,"."))) {
+	If $data(^EnsHL7.Schema(tSchema,"MT",$piece(localname,"."))) {
 		Quit
-	} ElseIf $data($$$vaSchemaGbl(tSchema,"SS",localname)) {
+	} ElseIf $data(^EnsHL7.Schema(tSchema,"SS",localname)) {
 		Set tSC=..%SegObj.SaveData()
 		Do:$$$ISERR(tSC) ..faultStatus(tSC)
 		Set ..%SegFields=""
@@ -457,13 +441,13 @@ Base Release: Rajiv Bhatia</Description>
 			}
 
 	
-	If ($data($$$vaSchemaGbl(tSchema,"SS",localname))) {
+	If ($data(^EnsHL7.Schema(tSchema,"SS",localname))) {
 		set ..%FieldPath=""
 	}
-	If ($data($$$vaSchemaGbl(tSchema,"SS",$piece(localname,".")))&&(+$piece(localname,".",2)>0)) {
+	If ($data(^EnsHL7.Schema(tSchema,"SS",$piece(localname,".")))&&(+$piece(localname,".",2)>0)) {
 		set ..%LastLevel=+$piece(localname,".",2)
 	}
-	if ($data($$$vaSchemaGbl(tSchema,"DT",$piece(localname,"."))) || $data($$$vaSchemaGbl(tSchema,"DS",$piece(localname,"."))))  {
+	if ($data(^EnsHL7.Schema(tSchema,"DS",$piece(localname,"."))))  {
 		/*if $lg(^EnsHL7.Schema(tSchema,"DS",$piece(localname,".")),$piece(localname,".",2))="" {*/
 			set tLength=1
 			if $length(..%FieldPath,".")>1 set tLength=$length(..%FieldPath,".")-1
@@ -691,30 +675,6 @@ ITB. to xml. Is Group End.</Description>
 			}
 		} // for
 	}
-]]></Implementation>
-</Method>
-
-<Method name="IsDTSimple">
-<Description>
-ITB. to xml. Return if DataType is simple (only one substructure) or not</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pCat:%String,pDT:%String=""</FormalSpec>
-<ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[
-	// if there is no structure (e.g. "ST","NM"), consider it simple.
-	if '$data($$$vaSchemaGbl(pCat,"DT",pDT)) {
-		quit 1
-	}
-	
-	// check if there is more than one node in data structure (e.g. "XCN")
-	set tNode="", tNumNodes=0
-	for {
-		set tNode=$order($$$vaSchemaGbl(pCat,"DT",pDT,"names",tNode))
-		quit:tNode=""
-		set tNumNodes=tNumNodes+1
-		quit:tNumNodes>1
-	}
-	quit (tNumNodes=1)
 ]]></Implementation>
 </Method>
 

@@ -123,7 +123,7 @@ Write the stream contents as on the TCP socket</Description>
 	try {
 		do {
 			set tTable = ##class(%IO.I.TranslationDevice).GetCharEncodingTable(pCharset)
-			//do SetIO^%NLS("RAW")
+			do SetIO^%NLS("RAW")
 
 			if "RAW"=tTable {
 				write ..Prefix
