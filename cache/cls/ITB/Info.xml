@@ -54,6 +54,7 @@
 	<li>1.7   - Fixed ITB.HL7.Format.HL7XMLv2, minor fixes in ITB.EnsPortal.ProductionMonitor.</li>
 	<li>1.8   - Fixed ITB.HL7.Format.HL7XMLv2, added support for field values > 32K, performance optimizations.</li>
 	<li>1.9   - Removed ITB.HL7.Data.NACK FK to Ens.MessageHeader. Added system task ITB.Task.PurgeNACK to delete async NACK messages that references to non-existing messages.</li>
+	<li>2.0   - Fixed ITB.HL7.Format.HL7XMLv2, fixed stream field writing. ITB.inc enhaced, uses max string values depending on 'Enable Long String' setting.</li>
 </ul>]]></Description>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63169,55480.291642</TimeCreated>
@@ -65,7 +66,7 @@ Location and Revision of this file in Perforce (Auto-updating)</Description>
 </Parameter>
 
 <Parameter name="VERSION">
-<Default>1.9</Default>
+<Default>2.0</Default>
 </Parameter>
 
 <Parameter name="PORTING">
