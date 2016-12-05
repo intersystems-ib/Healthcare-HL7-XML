@@ -353,6 +353,10 @@ Base Release: Rajiv Bhatia</Description>
 <Type>%String</Type>
 </Property>
 
+<Property name="%FieldPathDelayed">
+<Type>%String</Type>
+</Property>
+
 <Property name="%LastLevel">
 <Type>%Integer</Type>
 </Property>
@@ -362,6 +366,10 @@ Base Release: Rajiv Bhatia</Description>
 </Property>
 
 <Property name="%ContentStream">
+<Type>%Stream.GlobalCharacter</Type>
+</Property>
+
+<Property name="%ContentStreamDelayed">
 <Type>%Stream.GlobalCharacter</Type>
 </Property>
 
@@ -442,7 +450,15 @@ Base Release: Rajiv Bhatia</Description>
 	If $data($$$vaSchemaGbl(tSchema,"MT",$piece(localname,"."))) {
 		Quit
 	} ElseIf $data($$$vaSchemaGbl(tSchema,"SS",localname)) {
+		///ITB+
+		if ..%ContentStreamDelayed.Size>0 {
+			// write delayed stream field in the segment. segment will remain immutable after this.
+			do ..%ContentStreamDelayed.Rewind()
+			set tSC=..%SegObj.StoreFieldStreamRaw(..%ContentStreamDelayed, ..%FieldPathDelayed)
+			Do:$$$ISERR(tSC) ..faultStatus(tSC)
+		}
 		Set tSC=..%SegObj.SaveData()
+		///ITB-
 		Do:$$$ISERR(tSC) ..faultStatus(tSC)
 		Set ..%SegFields=""
 		Set ..%SegObj=$$$NULLOREF
@@ -549,8 +565,12 @@ ITB. xml to er7. Write SAX content to EnsLib.HL7.Segment</Description>
 	
 	#if $$$ITB32K
 		if ..%ContentStream.Size > 0 {
-			do ..%ContentStream.Rewind()
-			set tSC=..%SegObj.StoreFieldStreamRaw(..%ContentStream, ..%FieldPath)
+			// only one field can be stored as stream (the segment will remain immutable after that)
+			if ..%ContentStreamDelayed.Size>0 {
+				$$$ThrowStatus($$$ERROR($$$GeneralError, "Only one field in the segment can be larger that max string length"))
+			}
+			set ..%FieldPathDelayed = ..%FieldPath
+			do ..%ContentStreamDelayed.CopyFromAndSave(..%ContentStream)
 			set ..%ContentStream = ##class(%Stream.GlobalCharacter).%New()
 		} else {
 			set tSC=..%SegObj.SetValueAt(..EscapeXML($zstrip(..%Content,"*C"),..%SegObj.Separators),..%FieldPath)
