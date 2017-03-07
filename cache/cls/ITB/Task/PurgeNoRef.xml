@@ -107,7 +107,7 @@ do ##class(ITB.Task.PurgeNoRef).DeleteNoRef(1,0,"EnsLib.HL7.Message")
 		$$$NL_"  pMaxCount="_pMaxCount_
 		$$$NL_"  pMaxDelete="_pMaxDelete_
 		$$$NL_"  pProgress="_pProgress_
-		$$$NL_"Looking for objects non refereced by Ens.MessageHeader..."_$$$NL
+		$$$NL_"Looking for objects non referenced by Ens.MessageHeader..."_$$$NL
 		do ..Log(tTxt)
 		
 		set rset = ##class(%ResultSet).%New(pClass_":Extent")
@@ -124,8 +124,12 @@ do ##class(ITB.Task.PurgeNoRef).DeleteNoRef(1,0,"EnsLib.HL7.Message")
 				quit:headerId=""
 				
 				// if there is a reference to id and it is a pClass object, increment reference count
-				set header=##class(Ens.MessageHeader).%OpenId(headerId)
-				if header.MessageBodyClassName=pClass {
+				set msgBodyClassName=""
+				
+				&sql(SELECT MessageBodyClassName into :msgBodyClassName FROM Ens.MessageHeader WHERE id=:headerId)
+				set:SQLCODE'=0 msgBodyClassName=""
+				
+				if msgBodyClassName=pClass {
 					set ref=ref+1
 				}
 			}
