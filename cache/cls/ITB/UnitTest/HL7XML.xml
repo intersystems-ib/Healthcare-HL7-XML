@@ -77,15 +77,6 @@ HL7 ER7 to XML conversions</Description>
 			}
 			set xmlfile = tmp
 		}
-		// -> handle line terminator differences when using files downloaded from source code repo. 
-		else {
-			set tmp = ##class(%Stream.GlobalCharacter).%New()
-			while 'xmlfile.AtEnd {
-				set buf = $replace(xmlfile.Read(),$c(10),$c(13,10))
-				do tmp.Write(buf)
-			}
-			set xmlfile = tmp
-		}
 		
 		// import er7 file
 		set er7 = ##class(EnsLib.HL7.Message).ImportFromFile(er7path,,.sc)
