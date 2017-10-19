@@ -164,7 +164,7 @@ Check installation</Description>
 		do ..Log("ITB UnitTest",,0)
 		set ^UnitTestRoot = ##class(%File).NormalizeDirectory("", ..InstallPath)
 		set userParam = "v="_##class(ITB.Info).#VERSION
-		$$$THROWONERROR(sc, ##class(%UnitTest.Manager).RunTest("cls/ITB/UnitTest",,userParam))
+		$$$THROWONERROR(sc, ##class(%UnitTest.Manager).RunTest("cls/ITB/UnitTest","/nodelete",userParam))
 		do ..Log("",0,1)
 		do ..Log("ITB UnitTest ended")
 	} catch ex {
