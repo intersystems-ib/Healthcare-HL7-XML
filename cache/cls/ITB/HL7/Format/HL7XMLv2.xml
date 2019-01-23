@@ -9,7 +9,12 @@ See <class>ITK.HL7.Util.XSDParser</class></p>
 
 <p>Use <class>ITB.HL7.Util.Convert</class> to convert HL7 messages.</p>
 
-<p>Based on <class>EnsLib.ITK.HL7.FormatXMLv2</class> by Rajiv Bhatia</p>]]></Description>
+<p>Based on <class>EnsLib.ITK.HL7.FormatXMLv2</class> by Rajiv Bhatia</p>
+
+Changes:
+<ul>
+  <li> 2018-11-08, duquesno: Remove $ZSTRIP(,"*C") from XML elements, to keep LineFeeds (allow $c(10) to reach XMLEscape() function)</li>
+</ul>]]></Description>
 <IncludeCode>EnsHL7,ITB</IncludeCode>
 <Super>%XML.SAX.ContentHandler,EnsLib.EDI.IOFormatInterface</Super>
 <System>4</System>
@@ -573,10 +578,15 @@ ITB. xml to er7. Write SAX content to EnsLib.HL7.Segment</Description>
 			do ..%ContentStreamDelayed.CopyFromAndSave(..%ContentStream)
 			set ..%ContentStream = ##class(%Stream.GlobalCharacter).%New()
 		} else {
-			set tSC=..%SegObj.SetValueAt(..EscapeXML($zstrip(..%Content,"*C"),..%SegObj.Separators),..%FieldPath)
+			// Fix. Keep LineFeed characters
+			//set tSC=..%SegObj.SetValueAt(..EscapeXML($zstrip(..%Content,"*C"),..%SegObj.Separators),..%FieldPath)
+			set tSC=..%SegObj.SetValueAt(..EscapeXML(..%Content,..%SegObj.Separators),..%FieldPath)
 		}
+		
 	#else
-		set tSC=..%SegObj.SetValueAt(..EscapeXML($zstrip(..%Content,"*C"),..%SegObj.Separators),..%FieldPath)
+		// Fix. Keep LineFeed characters
+		//set tSC=..%SegObj.SetValueAt(..EscapeXML($zstrip(..%Content,"*C"),..%SegObj.Separators),..%FieldPath)
+		set tSC=..%SegObj.SetValueAt(..EscapeXML(..%Content,..%SegObj.Separators),..%FieldPath)
 	#endif
 	
 	set ..%Content=""
