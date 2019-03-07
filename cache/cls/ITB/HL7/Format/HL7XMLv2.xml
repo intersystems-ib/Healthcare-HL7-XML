@@ -570,10 +570,6 @@ ITB. xml to er7. Write SAX content to EnsLib.HL7.Segment</Description>
 	
 	#if $$$ITB32K
 		if ..%ContentStream.Size > 0 {
-			// only one field can be stored as stream (the segment will remain immutable after that)
-			if ..%ContentStreamDelayed.Size>0 {
-				$$$ThrowStatus($$$ERROR($$$GeneralError, "Only one field in the segment can be larger that max string length"))
-			}
 			set ..%FieldPathDelayed = ..%FieldPath
 			do ..%ContentStreamDelayed.CopyFromAndSave(..%ContentStream)
 			set ..%ContentStream = ##class(%Stream.GlobalCharacter).%New()
