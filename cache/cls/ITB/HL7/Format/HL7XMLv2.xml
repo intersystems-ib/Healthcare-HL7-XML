@@ -457,6 +457,7 @@ Base Release: Rajiv Bhatia</Description>
 	} ElseIf $data($$$vaSchemaGbl(tSchema,"SS",localname)) {
 		///ITB+
 		if ..%ContentStreamDelayed.Size>0 {
+			
 			// write delayed stream field in the segment. segment will remain immutable after this.
 			do ..%ContentStreamDelayed.Rewind()
 			set tSC=..%SegObj.StoreFieldStreamRaw(..%ContentStreamDelayed, ..%FieldPathDelayed)
