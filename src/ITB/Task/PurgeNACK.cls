@@ -2,9 +2,6 @@
 Class ITB.Task.PurgeNACK Extends %SYS.Task.Definition
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id: //custom_ccrs/_common/tools/Iberia/ITB/latest/cls/ITB/Task/PurgeNACK.xml#1 $";
-
 Parameter TaskName = "ITB.Task.PurgeNACK";
 
 /// The OnTask() method is called to execute the task

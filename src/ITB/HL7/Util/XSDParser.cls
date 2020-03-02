@@ -6,9 +6,6 @@
 Class ITB.HL7.Util.XSDParser Extends %XML.SAX.ContentHandler
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Prefix used in Lookup table names
 Parameter TABLEPREFIX = "hl7_";
 

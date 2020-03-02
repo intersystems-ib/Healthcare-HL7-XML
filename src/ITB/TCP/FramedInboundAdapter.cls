@@ -2,9 +2,6 @@
 Class ITB.TCP.FramedInboundAdapter Extends (EnsLib.TCP.InboundAdapter, ITB.TCP.FramedCommon)
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Parameter SERVICEINPUTCLASS = "%Stream.Object";
 
 Parameter SERVICEOUTPUTCLASS = "%Stream.Object";

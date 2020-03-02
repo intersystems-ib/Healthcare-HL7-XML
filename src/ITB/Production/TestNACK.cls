@@ -1,9 +1,6 @@
 Class ITB.Production.TestNACK Extends Ens.Production
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 XData ProductionDefinition
 {
 <Production Name="ITB.Production.TestNACK" TestingEnabled="true" LogGeneralTraceEvents="false">
@@ -32,7 +29,7 @@ XData ProductionDefinition
   <Item Name="HL7FileService" Category="ER7" ClassName="EnsLib.HL7.Service.FileService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="MessageSchemaCategory">2.5</Setting>
     <Setting Target="Host" Name="TargetConfigNames">HL7TCPOperation</Setting>
-    <Setting Target="Adapter" Name="FilePath">C:\Test\ITB\inHL7</Setting>
+    <Setting Target="Adapter" Name="FilePath">/app/samples/input</Setting>
     <Setting Target="Adapter" Name="ArchivePath"></Setting>
     <Setting Target="Adapter" Name="FileSpec">*.hl7</Setting>
     <Setting Target="Host" Name="SearchTableClass"></Setting>
@@ -44,7 +41,7 @@ XData ProductionDefinition
     <Setting Target="Host" Name="NACKControl">1</Setting>
   </Item>
   <Item Name="HL7FileXMLService" Category="XML" ClassName="ITB.HL7.BS.FileXMLService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="FilePath">C:\Test\ITB\inHL7</Setting>
+    <Setting Target="Adapter" Name="FilePath">/app/samples/input</Setting>
     <Setting Target="Adapter" Name="FileSpec">*.xml</Setting>
     <Setting Target="Host" Name="TargetConfigNames">HL7TCPXMLOperation</Setting>
     <Setting Target="Host" Name="SearchTableClass"></Setting>

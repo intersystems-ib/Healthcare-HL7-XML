@@ -2,9 +2,6 @@
 Class ITB.HL7.BO.FileXMLOperation Extends ITB.HL7.BO.XMLOperation
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Parameter ADAPTER = "EnsLib.File.OutboundAdapter";
 
 Property Adapter As EnsLib.File.OutboundAdapter;

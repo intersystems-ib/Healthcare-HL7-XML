@@ -2,9 +2,6 @@
 Class ITB.HL7.BS.TCPService Extends EnsLib.HL7.Service.TCPService
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Colon-separated LocalFacility:LocalApplication:MessageStructure codes representing this (receiving) facility, application, returning MessageStructure, AcceptAcknowledgmentType and ApplicationAcknowledgmentType<br/>
 /// These are used in constructing reply ACK message headers as SendingFacility, SendApplication and MessageStructure. <br/>
 /// The '@' symbol represents using the corresponding field from the incoming message. <br/>

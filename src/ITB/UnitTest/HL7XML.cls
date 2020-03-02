@@ -1,17 +1,8 @@
 Include ITB
 
 /// Test cases for HL7 ER7/XML basic conversions.
-/// <example>
-/// ; run tests
-/// zn "ENSEMBLE"
-/// set ^UnitTestRoot="C:\ISC\p4\custom_ccrs\_common\tools\Iberia\ITB\latest"
-/// do ##class(%UnitTest.Manager).RunTest("cls/ITB/UnitTest")
-/// </example>
 Class ITB.UnitTest.HL7XML Extends %UnitTest.TestCase
 {
-
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id: //custom_ccrs/_common/tools/Iberia/ITB/latest/cls/ITB/UnitTest/HL7XML.xml#4 $";
 
 /// Past to test files
 Property HL7Path As %String;
@@ -28,7 +19,7 @@ Method OnBeforeAllTests() As %Status
 		set base=##class(%File).NormalizeDirectory("", base)
 		if base="" $$$ThrowStatus($$$ERROR($$$GeneralError,"^UnitTestRoot path incorrect"))
 		
-		set ..HL7Path=##class(%File).SubDirectoryName(base,"tests/hl7",1)
+		set ..HL7Path=##class(%File).SubDirectoryName(base,"unittest/hl7",1)
 		if ..HL7Path="" $$$ThrowStatus($$$ERROR($$$GeneralError,"^UnitTestRoot TestPath path incorrect"))
 	} catch ex {
 		set ret = ex.AsStatus()

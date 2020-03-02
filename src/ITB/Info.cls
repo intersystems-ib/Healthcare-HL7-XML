@@ -57,9 +57,6 @@
 Class ITB.Info Extends %RegisteredObject
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Parameter VERSION = 3.0;
 
 Parameter PORTING = 2014;

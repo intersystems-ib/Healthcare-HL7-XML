@@ -24,9 +24,6 @@ Include Ensemble
 Class ITB.HL7.Data.NACK Extends %Persistent
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Original HL7 message Id
 Property OriginalId As Ens.MessageHeader;
 

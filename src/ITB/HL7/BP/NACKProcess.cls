@@ -2,9 +2,6 @@
 Class ITB.HL7.BP.NACKProcess Extends Ens.BusinessProcess [ ClassType = persistent, ProcedureBlock ]
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Name of production element that sent the original HL7 message
 Property Target As %String(MAXLEN = 200);
 

@@ -4,9 +4,6 @@ Include (%occInclude, Ensemble)
 Class ITB.TCP.FramedCommon Extends EnsLib.TCP.CountedCommon [ Abstract, ClassType = "", ProcedureBlock ]
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Frame Prefix Character (ASCII code)
 Property PrefixChar As %String [ InitialExpression = "11" ];
 

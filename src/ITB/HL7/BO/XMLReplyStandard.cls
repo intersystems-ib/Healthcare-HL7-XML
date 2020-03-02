@@ -3,9 +3,6 @@
 Class ITB.HL7.BO.XMLReplyStandard Extends (Ens.BusinessOperation, ITB.HL7.XMLHost)
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// A comma-separated list of codes specifying what action this Operation will take on receipt of various types of ACK response messages and other reply status conditions. <br/>
 /// The format of the list is: &lt;code&gt;=&lt;action&gt;,&lt;code&gt;=&lt;action&gt;,... <br/>
 /// A &lt;code&gt; value starting with a colon - e.g. :&lt;char&gt;&lt;char&gt; represents a literal value found in field MSA:1 of the response message. <br/>

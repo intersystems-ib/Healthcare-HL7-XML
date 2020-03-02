@@ -2,9 +2,6 @@
 Class ITB.HL7.BS.XMLService Extends (Ens.BusinessService, ITB.HL7.XMLHost)
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Property UseAckCommitCodes As %Boolean [ InitialExpression = 1 ];
 
 Property BadMessageHandler As %String(MAXLEN = 1000);

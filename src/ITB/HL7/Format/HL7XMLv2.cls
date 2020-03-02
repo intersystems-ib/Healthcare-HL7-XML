@@ -16,9 +16,6 @@ Include (EnsHL7, ITB)
 Class ITB.HL7.Format.HL7XMLv2 Extends (%XML.SAX.ContentHandler, EnsLib.EDI.IOFormatInterface) [ System = 4 ]
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Parameter ChildLinks = 10;
 
 /// Return 1 if we took care of the whole document or got an error. Returning 0 means the caller will continue doing component segments as usual.

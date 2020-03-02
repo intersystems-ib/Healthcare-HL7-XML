@@ -3,9 +3,6 @@
 Class ITB.HL7.BO.TCPXMLOperation Extends ITB.HL7.BO.XMLOperation
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Parameter ADAPTER = "ITB.TCP.FramedOutboundAdapter";
 
 Property Adapter As ITB.TCP.FramedOutboundAdapter;

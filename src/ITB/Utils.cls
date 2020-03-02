@@ -3,9 +3,6 @@ Include (Ensemble, %ZEN.ReportUtil, ITB)
 Class ITB.Utils Extends %RegisteredObject
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id: //custom_ccrs/_common/tools/Iberia/ITB/latest/cls/ITB/Utils.xml#3 $";
-
 /// Path of 7zip exe (used to build distribution package).
 Parameter ZIP = "C:\Program Files\7-Zip\7zG.exe";
 

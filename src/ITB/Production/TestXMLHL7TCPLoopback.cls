@@ -21,7 +21,7 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="StayConnected">5</Setting>
   </Item>
   <Item Name="HL7FileXMLOperation" Category="" ClassName="ITB.HL7.BO.FileXMLOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-    <Setting Target="Adapter" Name="FilePath">C:\Test\ITB\outHL7</Setting>
+    <Setting Target="Adapter" Name="FilePath">/app/samples/output</Setting>
     <Setting Target="Adapter" Name="Charset">UTF-8</Setting>
     <Setting Target="Host" Name="MessageSchemaCategory">ITB</Setting>
     <Setting Target="Host" Name="SearchTableClass"></Setting>
@@ -40,7 +40,7 @@ XData ProductionDefinition
   </Item>
   <Item Name="HL7FileXMLService" Category="" ClassName="ITB.HL7.BS.FileXMLService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
     <Setting Target="Host" Name="TargetConfigNames">HL7FileXMLOperation,HL7TCPXMLOperation</Setting>
-    <Setting Target="Adapter" Name="FilePath">C:\Test\ITB\inHL7</Setting>
+    <Setting Target="Adapter" Name="FilePath">/app/samples/input</Setting>
     <Setting Target="Host" Name="ArchiveIO">1</Setting>
     <Setting Target="Adapter" Name="FileSpec">*.xml</Setting>
     <Setting Target="Host" Name="AlertOnError">1</Setting>
@@ -59,8 +59,5 @@ XData ProductionDefinition
   </Item>
 </Production>
 }
-
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
 
 }

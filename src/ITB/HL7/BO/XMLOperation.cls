@@ -2,9 +2,6 @@
 Class ITB.HL7.BO.XMLOperation Extends ITB.HL7.BO.XMLReplyStandard
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Enable NACK control. A SearchTable MUST be used. Configure a Service to receive async NACK messages and process them in ITB.HL7.BP.NACKProcess
 Property NACKControl As %Boolean [ InitialExpression = 0 ];
 

@@ -4,9 +4,6 @@
 Class ITB.HL7.BS.SOAPXMLService Extends (EnsLib.SOAP.Service, ITB.HL7.BS.XMLService) [ ProcedureBlock ]
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// The SOAP name of this service.
 Parameter SERVICENAME = "HL7SOAPXMLService";
 

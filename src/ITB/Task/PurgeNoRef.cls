@@ -2,9 +2,6 @@
 Class ITB.Task.PurgeNoRef Extends %SYS.Task.Definition
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id: //custom_ccrs/_common/tools/Iberia/ITB/latest/cls/ITB/Task/PurgeNoRef.xml#1 $";
-
 Parameter TaskName = "ITB.Task.PurgeNoRef";
 
 /// 1=Really delete persistent objects, 0=Search objects only.

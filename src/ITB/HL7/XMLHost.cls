@@ -2,9 +2,6 @@
 Class ITB.HL7.XMLHost Extends Ens.Host
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Property TargetConfigNames As %String(MAXLEN = 1000);
 
 Property SearchTableClass As %String(MAXLEN = 128) [ InitialExpression = "EnsLib.HL7.SearchTable" ];

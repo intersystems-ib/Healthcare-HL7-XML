@@ -2,9 +2,6 @@
 Class ITB.HL7.BS.HTTPXMLService Extends ITB.HL7.BS.XMLService
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 Parameter ADAPTER = "EnsLib.HTTP.InboundAdapter";
 
 /// Content Type used to send the HTTP content

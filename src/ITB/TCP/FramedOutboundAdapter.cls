@@ -2,9 +2,6 @@
 Class ITB.TCP.FramedOutboundAdapter Extends (EnsLib.TCP.OutboundAdapter, ITB.TCP.FramedCommon)
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 /// Read out any data in the input buffer before sending output. This ensures that any reply received corresponds to the sent message, and if not looking for replies that the input buffer does not fill up with unexpected junk.
 Property FlushBeforeSend As %Boolean [ InitialExpression = 1 ];
 

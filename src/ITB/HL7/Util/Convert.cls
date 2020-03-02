@@ -14,9 +14,6 @@ Include ITB
 Class ITB.HL7.Util.Convert Extends Ens.Rule.FunctionSet
 {
 
-/// Location and Revision of this file in Perforce (Auto-updating)
-Parameter SrcVer = "$Id$";
-
 ClassMethod ER7ToXML(pER7 As EnsLib.HL7.Message, ByRef pSC, pCategory As %String = "", pCode As %String = "", pEvent As %String = "", pStripNamespace As %Boolean = 0) As %Stream
 {
 	set ret = ##class(%GlobalCharacterStream).%New()
