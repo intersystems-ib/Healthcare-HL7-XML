@@ -1,1 +1,6 @@
 *.bak
+.vscode/*
+samples/input/*.xml
+samples/input/*.hl7
+samples/output/*.xml
+samples/output/*.hl7*
