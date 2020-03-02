@@ -9,7 +9,8 @@
 /// 
 /// <h4>Requeriments:</h4>
 /// <ul>
-///  	<li>Ensemble 2014/2015</li>
+///  	<li>IRIS For Health</li>
+///     <li>Health Connect</li>
 /// </ul>
 /// 
 /// <h4>Installation:</h4>
@@ -53,11 +54,12 @@
 /// 	<li>2.0   - Fixed ITB.HL7.Format.HL7XMLv2, fixed stream field writing. ITB.inc enhaced, uses max string values depending on 'Enable Long String' setting.</li>
 /// 	<li>2.1   - Fixed ITB.HL7.Format.HL7XMLv2, support several segments with large stream fields</li>
 ///     <li>3.0   - Version for IRIS, Classes added in UDL, ITB.EnsPortal removed (not supported), added Installer manifest</li>
+///     <li>3.1   - Installer fixed</li>
 /// </ul>
 Class ITB.Info Extends %RegisteredObject
 {
 
-Parameter VERSION = 3.0;
+Parameter VERSION = 3.1;
 
 Parameter PORTING = 2014;
 
