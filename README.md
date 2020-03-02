@@ -3,7 +3,7 @@
 # What is included?
 *Healthcare HL7 XML* includes *Business Services* and *Operations* you can use in your productions to handle *ER7* and *XML HL7 messages* in the same way.
 
-<img src="./img/healthcare-hl7-xml-diagram.png" width="600px">
+<img src="https://github.com/intersystems-ib/Healthcare-HL7-XML/blob/master/img/healthcare-hl7-xml-diagram.png" width="600px">
 
 # Documentation
 See the [Wiki](https://github.com/intersystems-ib/healthcare-hl7-xml/wiki) for documentation and installation guide.
