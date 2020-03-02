@@ -68,7 +68,7 @@ ClassMethod RunWithParams(ByRef vars) As %Status
 
 		// check installation: version, unitests
 		set $namespace = vars("Namespace")
-		$$$ThrowOnError(..Check())
+		$$$ThrowOnError(..Check(vars("BasePath")))
 
         write !,"INSTALLER SUCCESS",!
 
@@ -98,7 +98,7 @@ ClassMethod Run(RunDir As %String) As %Status
 }
 
 /// Check installation
-ClassMethod Check() As %Status
+ClassMethod Check(pBasePath As %String) As %Status
 {
 	set ret = $$$OK
 	set oldRoot = $get(^UnitTestRoot)
@@ -111,7 +111,7 @@ ClassMethod Check() As %Status
 		do ..Log("Version checking ended")
 		
 		do ..Log("UnitTest",,0)
-		set ^UnitTestRoot = ##class(%File).NormalizeDirectory("", ..#BasePath)
+		set ^UnitTestRoot = ##class(%File).NormalizeDirectory("", pBasePath)
 		set userParam = "v="_##class(ITB.Info).#VERSION
 		$$$ThrowOnError(##class(%UnitTest.Manager).RunTest("src/ITB/UnitTest",,userParam))
 		do ..Log("",0,1)
