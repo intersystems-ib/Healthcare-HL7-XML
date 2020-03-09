@@ -434,6 +434,10 @@ Method characters(chars As %Library.String, length As %Library.Integer)
 	Set data=""
 	If ..%InCData=1 {
 		Set data=$E(chars,1,length)
+		// if unescaped (open xml tag) data found, preserve CDATA block
+		if $find(data,"<") {
+			set data = "<![CDATA["_data_"]]>"
+		}	
 	} Else {
 		Set data=$ZCVT($E(chars,1,length),"I","XML")
 	}
