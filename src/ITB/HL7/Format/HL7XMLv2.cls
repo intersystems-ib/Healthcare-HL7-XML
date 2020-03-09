@@ -684,7 +684,11 @@ ClassMethod WriteSegmentField(pIOStream As %IO.I.CharacterStream, pSegObj As Ens
 	#if $$$ITB32K
 		// use regular GetValueAt() if segment size < 32K
 		if pSegObj.FullSize < $$$CriticalSegmentLen {
-			do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+			if $find(pSegObj.GetValueAt(pPropertyPath),"<![CDATA[") {
+				do pIOStream.Write(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),,.pStatus)
+			}else{
+				do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+			}
 		}
 		else {
 			set pStatus = pSegObj.ReadRawDataStream(.tStream, pPropertyPath)
@@ -694,7 +698,11 @@ ClassMethod WriteSegmentField(pIOStream As %IO.I.CharacterStream, pSegObj As Ens
 			}
 		}
 	#else
-		do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+		if $find(pSegObj.GetValueAt(pPropertyPath),"<![CDATA[") {
+			do pIOStream.Write(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),,.pStatus)
+		}else{
+			do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+		}
 	#endif
 }
 
