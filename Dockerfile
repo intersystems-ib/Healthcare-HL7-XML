@@ -23,6 +23,7 @@ SHELL ["/irissession.sh"]
 RUN \
   # healthcare-hl7-xml installation
   do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck") \
+  do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Info.cls", "ck") \
   set vars("Namespace")="HL7XML" \
   set vars("CreateNamespace")="yes" \
   set vars("BasePath")="/opt/hl7xml/app" \
