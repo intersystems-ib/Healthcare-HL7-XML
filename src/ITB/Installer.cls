@@ -65,8 +65,8 @@ ClassMethod RunWithParams(ByRef vars) As %Status
 			$$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace "_vars("Namespace")_" has no Interoperability enabled"))
 		}
 
-		// downgrade configuration files (/config) for backwards compatibility with Ensemble (v. < 3.0)
-		if $Parameter("ITB.Info","VERSION") < 3.0 {
+		// downgrade configuration files (/config) for backwards compatibility with Ensemble 
+		if ($p($system.Version.GetProduct()," ") = "Cache") {
 			do ..Log("Update config files for compatibility with Ensemble")
 			$$$ThrowOnError(..DownGradeConfigFiles(vars("BasePath")_"config"))
 		}
