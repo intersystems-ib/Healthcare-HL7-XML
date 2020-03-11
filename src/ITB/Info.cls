@@ -55,11 +55,12 @@
 /// 	<li>2.1   - Fixed ITB.HL7.Format.HL7XMLv2, support several segments with large stream fields</li>
 ///     <li>3.0   - Version for IRIS, Classes added in UDL, ITB.EnsPortal removed (not supported), added Installer manifest</li>
 ///     <li>3.1   - Installer fixed</li>
+///     <li>3.2   - Fixed ITB.HL7.Format.HL7XMLv2, added support to unescape XML inside a CDATA block</li>
 /// </ul>
 Class ITB.Info Extends %RegisteredObject
 {
 
-Parameter VERSION = 3.1;
+Parameter VERSION = 3.2;
 
 Parameter PORTING = 2014;
 

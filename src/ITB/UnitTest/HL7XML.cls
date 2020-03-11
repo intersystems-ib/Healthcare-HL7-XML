@@ -134,7 +134,7 @@ Method TestBigField()
 {
 	#if $$$ITB32K	
 		#define BufSize 32000
-		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(2).OBX:5"
+		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(3).OBX:5"
 		
 		// generate a big stream of data
 		set buf = ""
@@ -145,6 +145,57 @@ Method TestBigField()
 		}
 		
 		do $$$AssertEquals(big.Size, 200*$$$BufSize, "generated big stream of "_(big.Size\1024)_" KB")
+		
+		// array to hold size of data before / after conversion
+		set size(0)=big.Size
+		set size(1)=""
+		
+		// load er7 message
+		set er7 = ##class(EnsLib.HL7.Message).ImportFromFile(..HL7Path_"ITB_OBX5.hl7")
+		set er7.DocType = "ITB:ORM_O01"
+		
+		// write buffer in OBX:5
+		do big.Rewind()
+		do er7.StoreFieldStreamRaw(big, $$$FieldPath)
+		
+		// convert er7 message to xml message
+		set xml = ##class(ITB.HL7.Util.Convert).ER7ToXML(er7,.sc)
+		do $$$AssertStatusOK(sc, "er7->xml")
+		
+		// convert xml message back to er7 message
+		do xml.Rewind()
+		set er7itb = ##class(ITB.HL7.Util.Convert).XMLToER7(xml,.sc,"ITB")
+		do $$$AssertStatusOK(sc, "xml->er7")
+		
+		// extract OBX:5 from converted message
+		do er7itb.GetFieldStreamRaw(.bigOutput, $$$FieldPath)
+		set size(1) = bigOutput.Size
+		
+		do $$$AssertEquals(size(0), size(1), "big stream with same size")
+	#else
+		quit
+	#endif
+}
+
+/// HL7 field with embedded XML greater than 32K
+Method TestBigXMLEmbeddedField()
+{
+	#if $$$ITB32K	
+		#define BufSize 32000
+		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(3).OBX:5"
+		
+		// generate a big stream of data
+        set buf=""
+		set cdata = "<![CDATA[<dat>"
+		for i=1:1:$$$BufSize-1 set buf=buf_"A"
+		set buf=buf_"B"
+		//for i=1:1:100 set buf=buf_"A"
+		set big = ##class(%Stream.GlobalCharacter).%New()
+		do big.Write(cdata)
+		for i=1:1:200 {
+			do big.Write(buf)
+		}
+		do big.Write("</dat>]]>")
 		
 		// array to hold size of data before / after conversion
 		set size(0)=big.Size

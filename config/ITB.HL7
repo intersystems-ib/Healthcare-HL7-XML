@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for UNIX (Ubuntu Server LTS for x86-64 Containers) 2020.1 (Build 199U)" ts="2020-02-27 13:22:35">
+<Export generator="IRIS">
 <Document name="ITB.HL7">
 <Category name="ITB" std="1">
 

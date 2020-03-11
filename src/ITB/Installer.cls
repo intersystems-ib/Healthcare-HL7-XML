@@ -54,17 +54,24 @@ ClassMethod RunWithParams(ByRef vars) As %Status
 
     try { 
         write "START INSTALLER",! 
-		
+
 		// set default values for installer variables
         for ivar="BasePath","Namespace","CreateNamespace","CreateDB","DataDBPath","CodeDBPath" {
             if '$data(vars(ivar)) set vars(ivar)=$parameter($classname(), ivar)
         }
-		$$$ThrowOnError(..RunManifest(.vars))
 
 		// check interoperability enabled on namespace
-		if '##class(%EnsembleMgr).IsEnsembleNamespace(vars("Namespace")) {
+		if ((vars("CreateNamespace") '= "yes")&&('##class(%EnsembleMgr).IsEnsembleNamespace(vars("Namespace")))) {
 			$$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace "_vars("Namespace")_" has no Interoperability enabled"))
 		}
+
+		// downgrade configuration files (/config) for backwards compatibility with Ensemble 
+		if ($p($system.Version.GetProduct()," ") = "Cache") {
+			do ..Log("Update config files for compatibility with Ensemble")
+			$$$ThrowOnError(..DownGradeConfigFiles(vars("BasePath")_"config"))
+		}
+
+		$$$ThrowOnError(..RunManifest(.vars))
 
 		// check installation: version, unitests
 		set $namespace = vars("Namespace")
@@ -140,6 +147,35 @@ ClassMethod Uninstall() As %Status
 		
 		do ..Log("Deleting classes...")
 		$$$ThrowOnError($system.OBJ.DeletePackage("ITB"))
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
+	quit ret
+}
+
+/// Change generator attribute in Export config items for Ensemble compatibility
+ClassMethod DownGradeConfigFiles(pDir As %String) As %Status
+{
+	set ret = $$$OK
+	try {
+		set firstLine = "<?xml version=""1.0"" encoding=""UTF-8""?>"
+		set secondLine = "<Export generator=""Cache"">"
+		set rs = ##class(%ResultSet).%New("%File:FileSet")
+		set sc = rs.Execute(pDir,"*")
+		while (rs.Next()) {
+			set file = ##class(%Stream.FileCharacter).%New()
+			set file.Filename = rs.Data("Name")
+			do file.ReadLine(), file.ReadLine()
+			set tmpstream = ##class(%Stream.GlobalCharacter).%New()
+			do tmpstream.WriteLine(firstLine), tmpstream.WriteLine(secondLine)
+			while 'file.AtEnd {
+				do tmpstream.Write(file.Read())
+			}
+			do file.Clear()
+			do file.Rewind()
+			do file.CopyFrom(tmpstream)
+			do file.%Save()
+		}
 	} catch ex {
 		set ret = ex.AsStatus()
 	}

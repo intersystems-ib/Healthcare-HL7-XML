@@ -391,7 +391,6 @@ Method endElement(uri As %Library.String, localname As %Library.String, qname As
 	} ElseIf $data($$$vaSchemaGbl(tSchema,"SS",localname)) {
 		///ITB+
 		if ..%ContentStreamDelayed.Size>0 {
-			
 			// write delayed stream field in the segment. segment will remain immutable after this.
 			do ..%ContentStreamDelayed.Rewind()
 			set tSC=..%SegObj.StoreFieldStreamRaw(..%ContentStreamDelayed, ..%FieldPathDelayed)
@@ -457,12 +456,17 @@ Method characters(chars As %Library.String, length As %Library.Integer)
 Method startCDATA()
 {
 	Set ..%InCData=1
-	Set ..%Content=""
+	Set ..%Content="<![CDATA["
 }
 
 Method endCDATA()
 {
 	Set ..%InCData=0
+	if (..%ContentStream.Size>0) {
+		do ..%ContentStream.Write("]]>")
+	}else{
+		Set ..%Content=..%Content_"]]>"
+	}
 }
 
 Method startEntity(name As %String)
@@ -684,7 +688,11 @@ ClassMethod WriteSegmentField(pIOStream As %IO.I.CharacterStream, pSegObj As Ens
 	#if $$$ITB32K
 		// use regular GetValueAt() if segment size < 32K
 		if pSegObj.FullSize < $$$CriticalSegmentLen {
-			do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+			if $find(pSegObj.GetValueAt(pPropertyPath),"<![CDATA[") {
+				do pIOStream.Write(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),,.pStatus)
+			}else{
+				do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+			}
 		}
 		else {
 			set pStatus = pSegObj.ReadRawDataStream(.tStream, pPropertyPath)
@@ -694,7 +702,11 @@ ClassMethod WriteSegmentField(pIOStream As %IO.I.CharacterStream, pSegObj As Ens
 			}
 		}
 	#else
-		do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+		if $find(pSegObj.GetValueAt(pPropertyPath),"<![CDATA[") {
+			do pIOStream.Write(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),,.pStatus)
+		}else{
+			do pIOStream.Write($zcvt(..UnescapeXML(pSegObj.GetValueAt(pPropertyPath),pSegObj.Separators),"O","XML"),,.pStatus)
+		}
 	#endif
 }
 
