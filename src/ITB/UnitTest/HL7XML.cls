@@ -134,7 +134,7 @@ Method TestBigField()
 {
 	#if $$$ITB32K	
 		#define BufSize 32000
-		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(2).OBX:5"
+		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(3).OBX:5"
 		
 		// generate a big stream of data
 		set buf = ""
@@ -182,7 +182,7 @@ Method TestBigXMLEmbeddedField()
 {
 	#if $$$ITB32K	
 		#define BufSize 32000
-		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(2).OBX:5"
+		#define FieldPath "ORCgrp(1).OBRuniongrp.OBXgrp(3).OBX:5"
 		
 		// generate a big stream of data
         set buf=""
