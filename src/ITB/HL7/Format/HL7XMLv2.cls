@@ -391,7 +391,6 @@ Method endElement(uri As %Library.String, localname As %Library.String, qname As
 	} ElseIf $data($$$vaSchemaGbl(tSchema,"SS",localname)) {
 		///ITB+
 		if ..%ContentStreamDelayed.Size>0 {
-			
 			// write delayed stream field in the segment. segment will remain immutable after this.
 			do ..%ContentStreamDelayed.Rewind()
 			set tSC=..%SegObj.StoreFieldStreamRaw(..%ContentStreamDelayed, ..%FieldPathDelayed)
@@ -434,10 +433,6 @@ Method characters(chars As %Library.String, length As %Library.Integer)
 	Set data=""
 	If ..%InCData=1 {
 		Set data=$E(chars,1,length)
-		// if unescaped (open xml tag) data found, preserve CDATA block
-		if $find(data,"<") {
-			set data = "<![CDATA["_data_"]]>"
-		}	
 	} Else {
 		Set data=$ZCVT($E(chars,1,length),"I","XML")
 	}
@@ -461,12 +456,17 @@ Method characters(chars As %Library.String, length As %Library.Integer)
 Method startCDATA()
 {
 	Set ..%InCData=1
-	Set ..%Content=""
+	Set ..%Content="<![CDATA["
 }
 
 Method endCDATA()
 {
 	Set ..%InCData=0
+	if (..%ContentStream.Size>0) {
+		do ..%ContentStream.Write("]]>")
+	}else{
+		Set ..%Content=..%Content_"]]>"
+	}
 }
 
 Method startEntity(name As %String)
