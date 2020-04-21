@@ -571,6 +571,7 @@ ClassMethod IsGroupStart(pSegObj As EnsLib.EDI.Segment, pIOStream As %IO.I.Chara
 			
 			&sql(select DataValue into :lkuValue from Ens_Util.LookupTable where id=:lkuId)
 			set:SQLCODE'=0 dataValue=0
+			if SQLCODE=100 continue
 			
 			// only add additional groups where a lookup value has been found
 			if lkuValue'=""	{
@@ -620,6 +621,7 @@ ClassMethod IsGroupEnd(pSegObj As EnsLib.EDI.Segment, pIOStream As %IO.I.Charact
 			
 			&sql(select DataValue into :lkuValue from Ens_Util.LookupTable where id=:lkuId)
 			set:SQLCODE'=0 dataValue=0
+			if SQLCODE=100 continue
 			
 			// only add additional groups where a lookup value has been found
 			if lkuValue'=""	{
