@@ -56,11 +56,12 @@
 ///     <li>3.0   - Version for IRIS, Classes added in UDL, ITB.EnsPortal removed (not supported), added Installer manifest</li>
 ///     <li>3.1   - Installer fixed</li>
 ///     <li>3.2   - Fixed ITB.HL7.Format.HL7XMLv2, added support to unescape XML inside a CDATA block</li>
+///     <li>3.3   - Fixed ITB.HL7.Format.HL7XMLv2, fixed &lt;0&gt; HL7 XML Segment added when no group found in LookUp Table</li>
 /// </ul>
 Class ITB.Info Extends %RegisteredObject
 {
 
-Parameter VERSION = 3.2;
+Parameter VERSION = 3.3;
 
 Parameter PORTING = 2014;
 
