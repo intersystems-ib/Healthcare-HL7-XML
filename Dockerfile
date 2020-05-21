@@ -1,5 +1,5 @@
 # healthcare-hl7-xml development image
-ARG IMAGE=store/intersystems/irishealth-community:2019.4.0.383.0
+ARG IMAGE=store/intersystems/irishealth-community:2020.1.0.215.0
 FROM $IMAGE
 
 USER root

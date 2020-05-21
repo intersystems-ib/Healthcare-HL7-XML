@@ -1,12 +1,14 @@
-version: '3.2'
+version: '3.7'
 
 services:
   # development environment for healthcare-hl7-xml
-  hl7xml:
+  healthcare-hl7-xml:
+    init: true
     build:
       dockerfile: Dockerfile
       context: .
-    container_name: hl7xml
+    image: healthcare-hl7-xml:dev
+    container_name: healthcare-hl7-xml
     ports:
     - "51773:51773"
     - "52773:52773"
