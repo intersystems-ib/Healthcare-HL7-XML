@@ -62,7 +62,7 @@ do ##class(ITB.Installer).Run("/tmp/Healthcare-HL7-XML-master")
 
 # Getting Started
 
-## Simple Conversions
+## Simple Conversions
 Conversions between ER7 and XML format can be made using `ITB.HL7.Util.Convert` class.
 
 ### ER7 to XML
