@@ -79,7 +79,7 @@ TEST>write xml.Read()
 ### XML To ER7
 ```
 TEST>set xml = ##class(%Stream.FileCharacter).%New()
-TEST>set xml.Filename="C:\Test\ITB\files\2.5_OBX5-ST.hl7.xml"
+TEST>set xml.Filename="/app/unittest/2.5_OBX5-ST.hl7.xml"
 TEST>set er7=##class(ITB.HL7.Util.Convert).XMLToER7(xml,.sc,"2.5")
 TEST>write sc
 1
@@ -91,6 +91,7 @@ ORC|NW|2089258||1760391|HD||^^^^^1||20131011093800000|||2214^TEST^LAIA|CIRC|||^R
 OBR||2089258||1^INTERTEST||||||^S/I^S/I||||||2214^SERRANO^LAIA|||CIRC||DIGH|||||
 OBX|1|ST|4|7|ABCD1234
 ```
+
 ## Test Productions
 *Healthcare HL7 XML* includes different productions in `ITB.Production.*` package which can be used to test HL7 XML components in an *Interoperability* production.
 

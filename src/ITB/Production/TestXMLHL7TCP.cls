@@ -36,11 +36,11 @@ XData ProductionDefinition
     <Setting Target="Host" Name="XMLInputHandler">HL7XML Log</Setting>
   </Item>
   <Item Name="HL7XML Error" Category="" ClassName="EnsLib.File.PassthroughOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="FilePath">C:\Test\ITB\error</Setting>
+    <Setting Target="Adapter" Name="FilePath">/app/samples/error</Setting>
     <Setting Target="Host" Name="Filename">%f_%Q.xml</Setting>
   </Item>
   <Item Name="HL7XML Log" Category="" ClassName="EnsLib.File.PassthroughOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="FilePath">C:\Test\ITB\log</Setting>
+    <Setting Target="Adapter" Name="FilePath">/app/samples/log</Setting>
     <Setting Target="Host" Name="Filename">%f_%Q.xml</Setting>
   </Item>
 </Production>
