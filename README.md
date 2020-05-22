@@ -1,4 +1,4 @@
-<img src="./img/twitter_header_photo_2.png" width="600px">
+<img src="./img/twitter_header_photo_2.png">
 
 *Healthcare HL7 XML* (also known as *ITB* or *Ensemble HL7 XML*) is an application you can install in [InterSystems Healthcare products](https://www.intersystems.com) to handle HL7 v.2.x messages in XML format.
 
