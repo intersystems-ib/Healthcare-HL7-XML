@@ -123,3 +123,10 @@ For instance: if it's needed to have an OBX.5 field with a data structured defin
 ```xml
 <SegmentSubStructure piece='5' description='Observation Value' datatype='@2' symbol='&' required='C' ifrepeating='1'/>
 ```
+
+---
+**NOTE**
+
+*This application is an open-source add-on for InterSystems HealthCare products and does not form part of the official release. InterSystems WRC technical assistance will not attend issues related with this application.*
+
+---
