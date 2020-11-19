@@ -19,6 +19,9 @@ Property MaxCount As %Integer [ InitialExpression = "10000" ];
 /// Max count of objects to delete.
 Property MaxDelete As %Integer [ InitialExpression = "1000" ];
 
+/// Restrict deletes only to messages prior to the first non purged message
+Property RestrictedMode As %Boolean [ InitialExpression = "0" ];
+
 /// The OnTask() method is called to execute the task
 Method OnTask() As %Status
 {
@@ -28,7 +31,7 @@ Method OnTask() As %Status
 		do ..Log("*PurgeNoRef Begin")
 		for i=1:1:$l(..ClassList,",") {
 			set cls = $piece(..ClassList,",",i)
-			$$$THROWONERROR(tSC, ..DeleteNoRef(..DeleteObjects, ..Verbose, cls, ..MaxCount, ..MaxDelete))
+			$$$THROWONERROR(tSC, ..DeleteNoRef(..DeleteObjects, ..Verbose, cls, ..MaxCount, ..MaxDelete, ..RestrictedMode))
 		}
 		do ..Log("*PurgeNoRef End")
 	} catch ex {
@@ -46,6 +49,7 @@ Method OnTask() As %Status
 ///  <li>pMaxCount: if greater than 0 max count of objects to process.</li>
 ///  <li>pMaxDeleted: if greater than 0 max count of non-referenced objects to process.</li>
 ///  <li>pProgress: if greater than 0 a "." will be printed for every pProgress number of objects processed.</li>
+///  <li>pRestricted: if greater than 0, it will not delete messages which ID are greater than the first ID found in MessageHeader
 /// </ul>
 /// <example>
 /// ; print objects only
@@ -53,11 +57,12 @@ Method OnTask() As %Status
 /// ; delete objects
 /// do ##class(ITB.Task.PurgeNoRef).DeleteNoRef(1,0,"EnsLib.HL7.Message")
 /// </example>
-ClassMethod DeleteNoRef(pDeleteMessages As %Boolean = 0, pVerbose As %Boolean = 0, pClass As %String = "EnsLib.HL7.Message", pMaxCount As %Integer = 10000, pMaxDelete As %Integer = 1000, pProgress As %Integer = 0) As %Status
+ClassMethod DeleteNoRef(pDeleteMessages As %Boolean = 0, pVerbose As %Boolean = 0, pClass As %String = "EnsLib.HL7.Message", pMaxCount As %Integer = 10000, pMaxDelete As %Integer = 1000, pProgress As %Integer = 0, pRestricted As %Integer = 0) As %Status
 {
 	set ret = $$$OK
 	try {
 		set (ncount,ntotal,ndeleted,nerrors)=0
+		set minimumID = ..GetMinimumID(pClass)
 		set tTxt=
 		$$$NL_"**DeleteNoRef (process="_$job_")**"_
 		$$$NL_"Parameters: "_
@@ -67,6 +72,7 @@ ClassMethod DeleteNoRef(pDeleteMessages As %Boolean = 0, pVerbose As %Boolean = 
 		$$$NL_"  pMaxCount="_pMaxCount_
 		$$$NL_"  pMaxDelete="_pMaxDelete_
 		$$$NL_"  pProgress="_pProgress_
+		$$$NL_"  pRestricted="_pRestricted_" (only ids smaller to "_minimumID_")"_
 		$$$NL_"Looking for objects non referenced by Ens.MessageHeader..."_$$$NL
 		do ..Log(tTxt)
 		
@@ -77,6 +83,11 @@ ClassMethod DeleteNoRef(pDeleteMessages As %Boolean = 0, pVerbose As %Boolean = 
  		while (rset.Next()) {
      		set id = rset.Data("ID")
  		
+		    if (pRestricted) && (id >= minimumID){
+	     		do ..Log($$$NL_"WARNING: Restricted mode. Reached first message not purged!"_$$$NL)
+	     		quit
+     		}
+
 			// Look for obj id in MessageHeader/MessageBodyId index
 			set headerId="", ref=0, delete=0
 			for {
@@ -135,6 +146,16 @@ ClassMethod DeleteNoRef(pDeleteMessages As %Boolean = 0, pVerbose As %Boolean = 
 		do ..Log("<ERROR> DeleteNoRef: "_$system.Status.GetOneErrorText(ret))
 	}
 	quit ret
+}
+
+/// Obtains the minimum MessageBodyID for a specified class name
+ClassMethod GetMinimumID(pClassName As %String) As %Integer
+{
+	Set tMsgId=0
+	&SQL(SELECT MIN(MessageBodyId), TimeCreated INTO :tMsgId, :tTimeCreated
+	     FROM Ens.MessageHeader
+	     WHERE MessageBodyClassName =:pClassName)
+	Quit tMsgId
 }
 
 /// Log a text message
