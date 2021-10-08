@@ -47,5 +47,25 @@ Method AfterInsertError(request As EnsLib.HL7.Message, tSC As %Status, pNumRows 
 	quit ret
 }
 
+Storage Default
+{
+<Data name="NACKProcessDefaultData">
+<Subscript>"NACKProcess"</Subscript>
+<Value name="1">
+<Value>Target</Value>
+</Value>
+<Value name="2">
+<Value>NACKCodes</Value>
+</Value>
+<Value name="3">
+<Value>AllowDuplicates</Value>
+</Value>
+<Value name="4">
+<Value>SearchTableClass</Value>
+</Value>
+</Data>
+<DefaultData>NACKProcessDefaultData</DefaultData>
+<Type>%Storage.Persistent</Type>
+}
 
 }

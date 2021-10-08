@@ -16,11 +16,12 @@ Method OnBeforeAllTests() As %Status
 		set base=^UnitTestRoot
 		if base="" $$$ThrowStatus($$$ERROR($$$GeneralError,"^UnitTestRoot cannot be empty"))
 		
-		set base=##class(%File).NormalizeDirectory("", base)
+		set base=##class(%File).NormalizeDirectory("../../../..", base)
 		if base="" $$$ThrowStatus($$$ERROR($$$GeneralError,"^UnitTestRoot path incorrect"))
 		
 		set ..HL7Path=##class(%File).SubDirectoryName(base,"unittest/hl7",1)
 		if ..HL7Path="" $$$ThrowStatus($$$ERROR($$$GeneralError,"^UnitTestRoot TestPath path incorrect"))
+		
 	} catch ex {
 		set ret = ex.AsStatus()
 	}

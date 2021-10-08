@@ -5,8 +5,8 @@ services:
   healthcare-hl7-xml:
     init: true
     build:
-      dockerfile: Dockerfile
       context: .
+      dockerfile: Dockerfile
     image: healthcare-hl7-xml:dev
     container_name: healthcare-hl7-xml
     ports:
