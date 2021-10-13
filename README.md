@@ -35,7 +35,7 @@ Healthcare HL7 XML supports:
 * **InterSystems IRIS For Health** version >= 2020.1.
 * **Health Connect** version >= 2020.1.
 
-You can still download latest **deprecated** releases(https://github.com/intersystems-ib/healthcare-hl7-xml/releases) compatible with older Ensemble versions.
+You can still download **deprecated** releases(https://github.com/intersystems-ib/healthcare-hl7-xml/releases) compatible with older versions.
 
 # Installation
 
