@@ -3,7 +3,7 @@
   <Document name="healthcare-hl7-xml.ZPM">
     <Module>
       <Name>healthcare-hl7-xml</Name>
-      <Version>3.3.0</Version>
+      <Version>3.4.0</Version>
       <Description>HealthCare HL7 XML eases the implementation of HL7 v.2.x in XML format using InterSystems technology</Description>
       <Keywords>xml interoperability hl7 iris healthconnect</Keywords>
       <Author>
