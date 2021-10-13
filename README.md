@@ -48,7 +48,7 @@ zpm:TEST> install healthcare-hl7-xml
 zpm:TEST> healthcare-hl7-xml test -verbose
 ```
 
-## Alternative installation
+## Alternative installation
 * Go to [Releases](https://github.com/intersystems-ib/Healthcare-HL7-XML/releases) and download the latest version.
 * Unzip it in a temporary directory (e.g. /tmp)
 * Open an interactive session (terminal)
