@@ -31,32 +31,35 @@ You can access now to the [Management Portal](http://localhost:52773/csp/sys/Uti
 
 
 # Requirements
-Healthcare HL7 XML supports only:
-* **InterSystems IRIS For Health**.
-* **Health Connect**.
-* **Ensemble >=2016.2**
+Healthcare HL7 XML supports:
+* **InterSystems IRIS For Health** version >= 2020.1.
+* **Health Connect** version >= 2020.1.
 
-You can still download latest **deprecated** release [v.2.1](https://github.com/intersystems-ib/healthcare-hl7-xml/releases/tag/v2.1) (compatible with older Ensemble releases)
+You can still download **deprecated** releases(https://github.com/intersystems-ib/healthcare-hl7-xml/releases) compatible with older versions.
 
 # Installation
+
+## Using ZPM 
+If you already have [ZPM Package Manager](https://github.com/intersystems-community/zpm), you can just move to your namespace and type:
+
+```
+TEST> zpm
+zpm:TEST> install healthcare-hl7-xml
+zpm:TEST> healthcare-hl7-xml test -verbose
+```
+
+## Alternative installation
 * Go to [Releases](https://github.com/intersystems-ib/Healthcare-HL7-XML/releases) and download the latest version.
-
 * Unzip it in a temporary directory (e.g. /tmp)
-
 * Open an interactive session (terminal)
-
 * Move to your namespace (e.g. TEST)
-```
+
+```objectscript
+// move to your namespace
 zn "TEST"
-```
-
-* Load installer from an interactive session (terminal):
-```objectscript
+// load installer
 do $system.OBJ.Load("/tmp/Healthcare-HL7-XML-master/src/ITB/Installer.cls","ck")
-```
-
-* Run installer:
-```objectscript
+// run installer
 do ##class(ITB.Installer).Run("/tmp/Healthcare-HL7-XML-master")
 ```
 

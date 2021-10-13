@@ -1,0 +1,51 @@
+    // Unexpire passwords for dev mode
+    zn "%SYS"
+    Do ##class(Security.Users).UnExpireUserPasswords("*")
+
+    // Use this script for testing installing procedures and run unittests
+
+    // ---------------------
+    // Regular install (HL7XML)
+    // ---------------------
+
+    // create test environment
+    zn "USER"
+    do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck")
+    set vars("CreateEnvironment")="yes"
+    set vars("RunNoZPMInstall")="no"
+    set vars("Namespace")="HL7XML"
+    set vars("BasePath")="/opt/hl7xml/app"
+    set vars("DataDBPath")="/opt/hl7xml/db/data"
+    set vars("CodeDBPath")="/opt/hl7xml/db/code"
+    set sc = ##class(ITB.Installer).RunWithParams(.vars)
+
+    // run classic installer
+    zn "HL7XML"
+    do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck")
+    set sc = ##class(ITB.Installer).Run(vars("BasePath"))
+
+    // ---------------------
+    // ZPM install (HL7XML-ZPM)
+    // ---------------------
+
+    // install latest zpm version
+    zn "%SYS"
+    do $SYSTEM.OBJ.Load("/tmp/zpm.xml", "ck")
+
+    // create test environment
+    zn "USER"
+    do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck")
+    set vars("CreateEnvironment")="yes"
+    set vars("RunNoZPMInstall")="no"
+    set vars("Namespace")="HL7XML-ZPM"
+    set vars("BasePath")="/opt/hl7xml/app"
+    set vars("DataDBPath")="/opt/hl7xml/db/data-zpm"
+    set vars("CodeDBPath")="/opt/hl7xml/db/code-zpm"
+    set sc = ##class(ITB.Installer).RunWithParams(.vars)
+    
+    // install module & run tests
+    zn "HL7XML-ZPM"
+    zpm "load -verbose /opt/hl7xml/app/"
+    zpm "healthcare-hl7-xml test -verbose"
+
+    halt

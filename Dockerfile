@@ -1,40 +1,33 @@
-# healthcare-hl7-xml development image
+#
+# HealthCare-HL7-XML sample environment
+#
+# Use this image to:
+# -Run Quick Start samples. See README.md
+# -Test HealthCare-HL7-XML developments and installation procedures.
+#
 ARG IMAGE=store/intersystems/irishealth-community:2020.1.0.215.0
+ARG IMAGE=store/intersystems/irishealth-community:2020.4.0.547.0
+ARG IMAGE=store/intersystems/irishealth-community:2021.1.0.215.0
 FROM $IMAGE
 
 USER root
-RUN mkdir -p /opt/hl7xml
-RUN mkdir -p /opt/hl7xml/app
-RUN mkdir -p /opt/hl7xml/db
-COPY irissession.sh /
-RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /irissession.sh
-RUN chmod u+x /irissession.sh
-RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/hl7xml
-RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/hl7xml/app
-RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/hl7xml/db
 
+# create directories for testing environment
+RUN mkdir -p /opt/hl7xml/app /opt/hl7xml/db
+
+# copy source code
 WORKDIR /opt/hl7xml
-
-USER irisowner
 COPY . app
-SHELL ["/irissession.sh"]
 
-# run installer
-RUN \
-  # healthcare-hl7-xml installation
-  do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck") \
-  set vars("Namespace")="HL7XML" \
-  set vars("CreateNamespace")="yes" \
-  set vars("BasePath")="/opt/hl7xml/app" \
-  set vars("DataDBPath")="/opt/hl7xml/db/data" \
-  set vars("CodeDBPath")="/opt/hl7xml/db/code" \
-  set sc = ##class(ITB.Installer).RunWithParams(.vars) \
-  # iris config
-  zn "%SYS" \
-  do ##class(SYS.Container).QuiesceForBundling() \
-  do ##class(Security.Users).UnExpireUserPasswords("*") \
-  halt
+# change ownership
+RUN chown -R ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/hl7xml
+USER ${ISC_PACKAGE_MGRUSER}
 
-# bringing the standard shell back
-SHELL ["/bin/bash", "-c"]
-CMD [ "-l", "/usr/irissys/mgr/messages.log" ]
+# download latest zpm version
+RUN wget https://pm.community.intersystems.com/packages/zpm/latest/installer -O /tmp/zpm.xml
+
+# run iris.script
+WORKDIR /opt/hl7xml/app
+RUN iris start IRIS \
+    && iris session IRIS < iris.script \
+    && iris stop IRIS quietly

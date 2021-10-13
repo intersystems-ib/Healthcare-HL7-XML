@@ -1,29 +1,8 @@
-/// <h2>ITB (InterSystems Tool Box)</h2>
+/// <h2>HealthCare HL7 XML</h2>
 /// 
-/// <h3>Reusable Ensemble components</h3>
+/// <h3>HealthCare HL7 XML eases the implementation of HL7 v.2.x in XML format using InterSystems technology</h3>
 /// 
-/// <h4>Author:</h4>
-/// <ul>
-///  	<li>alberto.fuentes@intersystems.com</li>
-/// </ul>
-/// 
-/// <h4>Requeriments:</h4>
-/// <ul>
-///  	<li>IRIS For Health</li>
-///     <li>Health Connect</li>
-/// </ul>
-/// 
-/// <h4>Installation:</h4>
-/// <ol>
-///  	<li>Import /backup/hl7_2_5.Lookup.xml lookup table <small><em>(it's used to convert HL7 XML group names <> EnsLib.HL7.Message group names)</em></small></li>
-///  	<li>Import and compile all ITB classes.</li>
-/// </ol> 
-/// 
-/// <h4>Quick start:</h4>
-/// <ul>
-///  	<li>If you are interested <em>only</em> in HL7 XML <> ER7 transformation see <class>ITB.HL7.Util.Convert</class></li>
-/// 	<li>If you want to test HL7 XML services, operations <em>(TCP,HTTP,SOAP,etc.)</em> there's a bunch of <em>testing productions</em> in ITB.Production.*</li>
-/// </ul>
+/// See README.md
 /// 
 /// <h4>Changelog:</h4>
 /// <ul>
@@ -57,11 +36,12 @@
 ///     <li>3.1   - Installer fixed</li>
 ///     <li>3.2   - Fixed ITB.HL7.Format.HL7XMLv2, added support to unescape XML inside a CDATA block</li>
 ///     <li>3.3   - Fixed ITB.HL7.Format.HL7XMLv2, fixed &lt;0&gt; HL7 XML Segment added when no group found in LookUp Table</li>
+///     <li>3.4   - Added support for zpm. Supported versions are now only >= 2020</li>
 /// </ul>
 Class ITB.Info Extends %RegisteredObject
 {
 
-Parameter VERSION = 3.3;
+Parameter VERSION = 3.4;
 
 Parameter PORTING = 2014;
 

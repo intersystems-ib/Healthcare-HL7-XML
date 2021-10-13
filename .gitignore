@@ -6,4 +6,5 @@ samples/output/*.xml
 samples/output/*.hl7*
 samples/log/*.xml
 samples/error/*.xml
+samples/unittest/*
 tmp/*
