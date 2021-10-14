@@ -28,7 +28,7 @@ You will have the following running:
 ## ZPM Package Manager
 See [Testing packages for ZPM](https://community.intersystems.com/post/testing-packages-zpm) to learn about how to test zpm package publishing and deploying:
 
-### Test publishing
+### Test publishing
 Load module from local developing environment:
 ```
 SER>zn "hl7xml-zpm"
@@ -76,7 +76,7 @@ registry https://test.pm.community.intersystems.com/registry/:
 healthcare-hl7-xml 3.4.0
 ```
 
-### Test deploying
+### Test deploying
 
 Create an IRIS container:
 ```
