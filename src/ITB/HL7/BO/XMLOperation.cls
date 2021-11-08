@@ -29,10 +29,13 @@ Method SendHL7XML(pRequest As EnsLib.HL7.Message, Output pResponse As EnsLib.HL7
 		// convert EnsLib.HL7.Message to XML
 		set tXML = ##class(ITB.HL7.Util.Convert).ER7ToXML(pRequest,.tSC,..MessageSchemaCategory,,,..StripNamespace)
 		if $$$ISERR(tSC) $$$ThrowStatus(tSC)
+
+		// call XML message handler before sending
+		$$$ThrowOnError(..HandleXMLBeforeSending(tXML, .tXMLToSend))
 		
 		// send XML through adapter
 		set tAckXML = ##class(%Stream.GlobalCharacter).%New()
-		$$$THROWONERROR(tSC, ..AdapterSendStream(tXML,.tAckXML))
+		$$$THROWONERROR(tSC, ..AdapterSendStream(tXMLToSend, .tAckXML))
 		
 		if pGetAck {
 			// show received XML
@@ -68,6 +71,13 @@ Method SendHL7XML(pRequest As EnsLib.HL7.Message, Output pResponse As EnsLib.HL7
 /// Send stream using Adapter (this method should be overwritten in derived operations)
 Method AdapterSendStream(pRequest As %Stream.Object, Output pResponse As %Stream.Object) As %Status
 {
+}
+
+/// Handle XML before sending. This method can be overridden to perform transformations in XML before sending message.
+Method HandleXMLBeforeSending(pXML As %Stream.Object, Output pXMLToSend As %Stream.Object) As %Status
+{
+	set pXMLToSend = pXML
+	quit $$$OK
 }
 
 /// Return an array of connections for drawing lines on the config diagram
