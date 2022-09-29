@@ -681,7 +681,8 @@ ClassMethod UnescapeXML(pData, pSeparators, pEscapeChar)
 	Set replace(tEscape_"S"_tEscape)=$$$CSSEP(pSeparators)
 	Set replace(tEscape_"T"_tEscape)=$$$SSSEP(pSeparators)
 	Set replace(tEscape_"E"_tEscape)=$$$ESCSEP(pSeparators)
-	Quit $$replaceArrayLeftToRight^EnsUtil(pData,.replace,5,.pLastPos)
+	Set replace(tEscape_"X00"_tEscape)=""     // empty fields in XML can be created using "\X00\"
+	quit $$replaceArrayLeftToRight^EnsUtil(pData,.replace,5,.pLastPos)
 }
 
 /// ITB. to xml. Write a segment field into a given IOStream
