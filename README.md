@@ -45,7 +45,6 @@ If you already have [ZPM Package Manager](https://github.com/intersystems-commun
 ```
 TEST> zpm
 zpm:TEST> install healthcare-hl7-xml
-zpm:TEST> healthcare-hl7-xml test -verbose
 ```
 
 ## Alternative installation
