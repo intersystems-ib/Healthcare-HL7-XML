@@ -80,7 +80,7 @@ healthcare-hl7-xml 3.4.0
 
 Create an IRIS container:
 ```
-docker run --name my-iris -d --publish 9091:51773 --publish 9092:52773 intersystemsdc/irishealth-community:2021.1.0.215.0-zpm
+docker run --name my-iris -d --publish 9091:51773 --publish 9092:52773 intersystemsdc/irishealth-community:2022.1.0.209.0-zpm --check-caps false
 ```
 
 Change *superuser* default password using [Management Portal](http://localhost:9092/csp/sys/UtilHome.csp).
