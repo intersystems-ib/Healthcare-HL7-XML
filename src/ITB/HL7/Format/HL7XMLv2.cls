@@ -681,6 +681,7 @@ ClassMethod UnescapeXML(pData, pSeparators, pEscapeChar)
 	Set replace(tEscape_"S"_tEscape)=$$$CSSEP(pSeparators)
 	Set replace(tEscape_"T"_tEscape)=$$$SSSEP(pSeparators)
 	Set replace(tEscape_"E"_tEscape)=$$$ESCSEP(pSeparators)
+	set replace(tEscape_"X00"_tEscape)=""
 	Quit $$replaceArrayLeftToRight^EnsUtil(pData,.replace,5,.pLastPos)
 }
 
