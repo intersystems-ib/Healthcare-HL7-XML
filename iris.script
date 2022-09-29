@@ -46,6 +46,6 @@
     // install module & run tests
     zn "HL7XML-ZPM"
     zpm "load -verbose /opt/hl7xml/app/"
-    zpm "healthcare-hl7-xml test -verbose"
+    ;zpm "healthcare-hl7-xml test -verbose"
 
     halt

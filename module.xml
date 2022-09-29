@@ -3,26 +3,28 @@
   <Document name="healthcare-hl7-xml.ZPM">
     <Module>
       <Name>healthcare-hl7-xml</Name>
-      <Version>3.4.0</Version>
+      <Version>3.5.0</Version>
       <Description>HealthCare HL7 XML eases the implementation of HL7 v.2.x in XML format using InterSystems technology</Description>
       <Keywords>xml interoperability hl7 iris healthconnect</Keywords>
       <Author>
         <Person>InterSystems Iberia</Person>
         <Organization>InterSystems</Organization>
-        <CopyrightDate>2021</CopyrightDate>
+        <CopyrightDate>2022</CopyrightDate>
         <License>MIT</License>
       </Author>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      <SystemRequirements Version=">=2020.1" Interoperability="enabled" />
+      <SystemRequirements Interoperability="enabled" />
       <Resource Name="ITB.INC"/>
       <Resource Name="ITB.PKG"/>
       <Resource Name="ITB.HL7" Directory="config" FilenameExtension="HL7.XML" />
       <Resource Name="hl7_2.5.LUT" Directory="config" FilenameExtension="LUT.XML" />
       <Resource Name="hl7_2.6.LUT" Directory="config" FilenameExtension="LUT.XML" />
       <Resource Name="hl7_ITB.LUT" Directory="config" FilenameExtension="LUT.XML" />
-      <FileCopy Name="/unittest" Target="${root}/samples/unittest"/>
+      <!--
+      <FileCopy Name="/unittest/" Target="${root}/test/"/>
       <UnitTest Name="/unittest/src/" Class="ITB.UnitTest.HL7XML" Phase="test"/>
+      -->
     </Module>
   </Document>
 </Export>
