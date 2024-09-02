@@ -158,7 +158,12 @@ Method TestBigField()
 		// write buffer in OBX:5
 		do big.Rewind()
 		do er7.StoreFieldStreamRaw(big, $$$FieldPath)
-		
+
+		// test standard StoreFieldStreamRaw / GetFieldStreamRaw
+		do er7.GetFieldStreamRaw(.bigEr7, $$$FieldPath)
+		set size(1) = bigEr7.Size
+		do $$$AssertEquals(size(0), size(1), "("_er7.DocType_") ER7 StoreFieldStreamRaw / GetFieldStreamRaw: "_size(0)_", "_size(1))
+
 		// convert er7 message to xml message
 		set xml = ##class(ITB.HL7.Util.Convert).ER7ToXML(er7,.sc)
 		do $$$AssertStatusOK(sc, "er7->xml")
@@ -172,7 +177,7 @@ Method TestBigField()
 		do er7itb.GetFieldStreamRaw(.bigOutput, $$$FieldPath)
 		set size(1) = bigOutput.Size
 		
-		do $$$AssertEquals(size(0), size(1), "big stream with same size")
+		do $$$AssertEquals(size(0), size(1), "("_er7itb.DocType_") big stream with same size: "_size(0)_", "_size(1))
 	#else
 		quit
 	#endif

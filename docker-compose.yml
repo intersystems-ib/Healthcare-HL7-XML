@@ -1,17 +1,15 @@
-version: '3.7'
+# quickstart environment for healthcare-hl7-xml
 
 services:
-  # development environment for healthcare-hl7-xml
   healthcare-hl7-xml:
     init: true
     build:
       context: .
       dockerfile: Dockerfile
-    command: --check-caps false
     image: healthcare-hl7-xml:dev
     container_name: healthcare-hl7-xml
     ports:
-    - 51773:1972
-    - "52773:52773"
+    - 1972:1972
+    - 52773:52773
     volumes:
     - .:/app

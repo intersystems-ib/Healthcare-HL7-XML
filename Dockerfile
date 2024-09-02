@@ -1,11 +1,10 @@
-#
-# HealthCare-HL7-XML sample environment
+# HealthCare-HL7-XML quickstart environment
 #
 # Use this image to:
 # -Run Quick Start samples. See README.md
-# -Test HealthCare-HL7-XML developments and installation procedures.
+# -Test HealthCare-HL7-XML development and installation
 #
-ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:2022.1.0.209.0
+ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:2023.1
 FROM $IMAGE
 
 USER root
@@ -20,9 +19,6 @@ COPY . app
 # change ownership
 RUN chown -R ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/hl7xml
 USER ${ISC_PACKAGE_MGRUSER}
-
-# download latest zpm version
-RUN wget https://pm.community.intersystems.com/packages/zpm/latest/installer -O /tmp/zpm.xml
 
 # run iris.script
 WORKDIR /opt/hl7xml/app

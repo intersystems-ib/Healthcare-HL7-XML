@@ -29,7 +29,6 @@ You can access now to the [Management Portal](http://localhost:52773/csp/sys/Uti
 
 5. See the messages in the production and have a look at [/samples/output](./samples/output)
 
-
 # Requirements
 Healthcare HL7 XML supports:
 * **InterSystems IRIS For Health** version >= 2020.1.
@@ -39,27 +38,12 @@ You can still download **deprecated** releases(https://github.com/intersystems-i
 
 # Installation
 
-## Using ZPM 
-If you already have [ZPM Package Manager](https://github.com/intersystems-community/zpm), you can just move to your namespace and type:
-
-```
-TEST> zpm
-zpm:TEST> install healthcare-hl7-xml
-```
-
-## Alternative installation
-* Go to [Releases](https://github.com/intersystems-ib/Healthcare-HL7-XML/releases) and download the latest version.
-* Unzip it in a temporary directory (e.g. /tmp)
-* Open an interactive session (terminal)
-* Move to your namespace (e.g. TEST)
+1) Install [IPM package manager](https://github.com/intersystems/ipm) if you don't have already done it.
+2) Create or switch to the namespace you want install the package.
+3) Install Healthcare-HL7-XML using ipm:
 
 ```objectscript
-// move to your namespace
-zn "TEST"
-// load installer
-do $system.OBJ.Load("/tmp/Healthcare-HL7-XML-master/src/ITB/Installer.cls","ck")
-// run installer
-do ##class(ITB.Installer).Run("/tmp/Healthcare-HL7-XML-master")
+TEST> zpm "install healthcare-hl7-xml"
 ```
 
 # Getting Started

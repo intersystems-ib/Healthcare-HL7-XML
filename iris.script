@@ -2,50 +2,17 @@
     zn "%SYS"
     Do ##class(Security.Users).UnExpireUserPasswords("*")
 
-    // Use this script for testing installing procedures and run unittests
-
-    // ---------------------
-    // Regular install (HL7XML)
-    // ---------------------
-
-    // create test environment
-    zn "USER"
-    do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck")
-    set vars("CreateEnvironment")="yes"
-    set vars("RunNoZPMInstall")="no"
-    set vars("Namespace")="HL7XML"
-    set vars("BasePath")="/opt/hl7xml/app"
-    set vars("DataDBPath")="/opt/hl7xml/db/data"
-    set vars("CodeDBPath")="/opt/hl7xml/db/code"
-    set sc = ##class(ITB.Installer).RunWithParams(.vars)
-
-    // run classic installer
-    zn "HL7XML"
-    do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck")
-    set sc = ##class(ITB.Installer).Run(vars("BasePath"))
-
-    // ---------------------
-    // ZPM install (HL7XML-ZPM)
-    // ---------------------
-
-    // install latest zpm version
+    // install latest ipm version
     zn "%SYS"
-    do $SYSTEM.OBJ.Load("/tmp/zpm.xml", "ck")
+    set r=##class(%Net.HttpRequest).%New(),r.Server="pm.community.intersystems.com",r.SSLConfiguration="ISC.FeatureTracker.SSL.Config" d r.Get("/packages/zpm/latest/installer"),$system.OBJ.LoadStream(r.HttpResponse.Data,"c")
 
-    // create test environment
-    zn "USER"
-    do $SYSTEM.OBJ.Load("/opt/hl7xml/app/src/ITB/Installer.cls", "ck")
-    set vars("CreateEnvironment")="yes"
-    set vars("RunNoZPMInstall")="no"
-    set vars("Namespace")="HL7XML-ZPM"
-    set vars("BasePath")="/opt/hl7xml/app"
-    set vars("DataDBPath")="/opt/hl7xml/db/data-zpm"
-    set vars("CodeDBPath")="/opt/hl7xml/db/code-zpm"
-    set sc = ##class(ITB.Installer).RunWithParams(.vars)
-    
+    // create quickstart environment
+    set $namespace = "HSLIB"
+    do ##class(HS.Util.Installer.Foundation).Install("HL7XML")
+
     // install module & run tests
-    zn "HL7XML-ZPM"
+    set $namespace = "HL7XML"
     zpm "load -verbose /opt/hl7xml/app/"
-    ;zpm "healthcare-hl7-xml test -verbose"
+    zpm "healthcare-hl7-xml test -verbose"
 
     halt
