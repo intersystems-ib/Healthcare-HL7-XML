@@ -698,8 +698,13 @@ ClassMethod WriteSegmentField(pIOStream As %IO.I.CharacterStream, pSegObj As Ens
 			}
 		}
 		else {
-			set pStatus = pSegObj.ReadRawDataStream(.tStream, pPropertyPath)
-			//set pStatus = pSegObj.GetFieldStreamRaw(.tStream, pPropertyPath, .remainder) ;# MAXSTRING error when remainder too long!
+			#if $$$VersionAbove2024 
+				;# GetFieldStreamRaw throws MAXSTRING error when remainder too long! if version < 2024
+				set pStatus = pSegObj.GetFieldStreamRaw(.tStream, pPropertyPath, .remainder)
+			#else
+				set pStatus = pSegObj.ReadRawDataStream(.tStream, pPropertyPath)
+			#endif
+
 			while 'tStream.AtEnd {
 				do pIOStream.Write(..UnescapeXML(tStream.Read(),pSegObj.Separators),,.pStatus)
 			}

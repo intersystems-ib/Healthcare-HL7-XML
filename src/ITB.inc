@@ -15,4 +15,7 @@ ROUTINE ITB [Type=INC]
 
 #; Max message length to consider using a string or stream
 #define CriticalMessageLen $$$MaxStringLen
+
+#; Check if 2024 or above version
+#define VersionAbove2024 ##expression((##class(%SYSTEM.Version).GetMajor() >= 2024))
 																															

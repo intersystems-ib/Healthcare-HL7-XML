@@ -38,7 +38,7 @@
 ///     <li>3.3   - Fixed ITB.HL7.Format.HL7XMLv2, fixed &lt;0&gt; HL7 XML Segment added when no group found in LookUp Table</li>
 ///     <li>3.4   - Added support for zpm. Supported versions are now only >= 2020</li>
 ///     <li>3.5   - Added support for creating HL7 XML empty fields</li>
-///     <li>3.6   - IPM installation only. Fixed some installation issues and simplied process</li>
+///     <li>3.6   - IPM installation only (simplified). Fixed installation issues. Fixed pre/post 2024 ReadRawDataStream / GetFieldStreamRaw in ITB.HL7.Format.HL7XMLv2</li>
 /// </ul>
 Class ITB.Info Extends %RegisteredObject
 {

@@ -46,6 +46,7 @@ See [Testing packages for ZPM](https://community.intersystems.com/post/testing-p
 
 Load module from local dev environment:
 ```objectscript
+zn "HL7XML"
 zpm "load /app"
 ```
 
@@ -71,12 +72,12 @@ zpm "search"
 
 Run a container with an IRIS instance
 ```bash
-docker run --name my-iris -d --publish 9091:51773 --publish 9092:52773 containers.intersystems.com/intersystems/irishealth-community:2023.1
+docker run --name my-iris -d --publish 9091:51773 --publish 9092:52773 containers.intersystems.com/intersystems/irishealth-community:latest-em
 ```
 
 Install ipm
 ```bash
-docker exec -it my-iris iris session IRIS
+docker exec -it my-iris iris session iris
 set r=##class(%Net.HttpRequest).%New(),r.Server="pm.community.intersystems.com",r.SSLConfiguration="ISC.FeatureTracker.SSL.Config" d r.Get("/packages/zpm/latest/installer"),$system.OBJ.LoadStream(r.HttpResponse.Data,"c")
 ```
 
