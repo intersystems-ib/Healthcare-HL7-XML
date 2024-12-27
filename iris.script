@@ -1,17 +1,17 @@
     // Unexpire passwords for dev mode
     zn "%SYS"
-    Do ##class(Security.Users).UnExpireUserPasswords("*")
-
-    // install latest ipm version
-    zn "%SYS"
-    set r=##class(%Net.HttpRequest).%New(),r.Server="pm.community.intersystems.com",r.SSLConfiguration="ISC.FeatureTracker.SSL.Config" d r.Get("/packages/zpm/latest/installer"),$system.OBJ.LoadStream(r.HttpResponse.Data,"c")
+    do ##class(Security.Users).UnExpireUserPasswords("*")
 
     // create quickstart environment
     set $namespace = "HSLIB"
     do ##class(HS.Util.Installer.Foundation).Install("HL7XML")
+    
+    set $namespace = "HL7XML"
+
+    // install latest ipm version
+    set r=##class(%Net.HttpRequest).%New(),r.Server="pm.community.intersystems.com",r.SSLConfiguration="ISC.FeatureTracker.SSL.Config" d r.Get("/packages/zpm/latest/installer"),$system.OBJ.LoadStream(r.HttpResponse.Data,"c")
 
     // install module & run tests
-    set $namespace = "HL7XML"
     zpm "load -verbose /opt/hl7xml/app/"
     zpm "healthcare-hl7-xml test -verbose"
 
