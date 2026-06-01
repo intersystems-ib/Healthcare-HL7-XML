@@ -4,7 +4,7 @@
 # -Run Quick Start samples. See README.md
 # -Test HealthCare-HL7-XML development and installation
 #
-ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:latest-em
+ARG IMAGE=containers.intersystems.com/intersystems/irishealth-community:2025.3
 FROM $IMAGE
 
 USER root
