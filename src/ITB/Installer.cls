@@ -49,7 +49,10 @@ XData RunNoZPMInstallManifest
 	<Log Text="Using namespace ${Namespace}" Level="0"/> 
 	<Namespace Name="${Namespace}" Create="no" Ensemble=""> 
 		<Import File="${SourcePath}ITB.inc" Recurse="0" Flags="cuk" />
-		<Import File="${SourcePath}" Recurse="1" Flags="cuk" />
+		<Import File="${SourcePath}ITB/" Recurse="1" Flags="cuk" />
+		<Import File="${SourcePath}config/hl7_2.5.lut" Recurse="0" Flags="cuk" />
+		<Import File="${SourcePath}config/hl7_2.6.lut" Recurse="0" Flags="cuk" />
+		<Import File="${SourcePath}config/hl7_ITB.lut" Recurse="0" Flags="cuk" />
 		<Import File="${BasePath}/unittest/src/" Recurse="1" Flags="cuk" />
 	</Namespace>
 </Manifest>
@@ -116,8 +119,10 @@ ClassMethod RunWithParams(ByRef vars) As %Status
 		if vars("RunNoZPMInstall") = "yes" {
 			$$$ThrowOnError(..RunNoZPMInstallManifest(.vars))
 
-			// check installation: version, unitests
 			set $namespace = vars("Namespace")
+			$$$ThrowOnError(..LoadITBSchema(##class(%File).NormalizeFilename("src/config/ITB.XML",vars("BasePath"))))
+
+			// check installation: version, unitests
 			$$$ThrowOnError(..RunTests(vars("BasePath")))
 		}
 		
@@ -157,6 +162,30 @@ ClassMethod RunTests(pBasePath As %String) As %Status
 		set ret = ex.AsStatus()
 	}
 	set ^UnitTestRoot = oldRoot
+	quit ret
+}
+
+/// Load an HL7 schema using the compatibility importer.
+/// pSchemaPath must be the full path to the schema XML file.
+ClassMethod LoadITBSchema(pSchemaPath As %String) As %Status
+{
+	set ret = $$$OK
+	set category = ""
+	try {
+		set schemaFile = ##class(%File).NormalizeFilename(pSchemaPath)
+		if '##class(%File).Exists(schemaFile) {
+			$$$ThrowStatus($$$ERROR($$$FileDoesNotExist,schemaFile))
+		}
+
+		do ..Log("Loading HL7 schema "_schemaFile)
+		$$$ThrowOnError(##class(ITB.EnsLib.HL7.SchemaXML).Import(schemaFile,.category))
+		if category'="ITB" {
+			$$$ThrowStatus($$$ERROR($$$GeneralError,"Unexpected HL7 schema category loaded: "_$S(category="":"<empty>",1:category)))
+		}
+		do ..Log("HL7 schema loaded: "_category)
+	} catch ex {
+		set ret = ex.AsStatus()
+	}
 	quit ret
 }
 

@@ -39,11 +39,12 @@
 ///     <li>3.4   - Added support for zpm. Supported versions are now only >= 2020</li>
 ///     <li>3.5   - Added support for creating HL7 XML empty fields</li>
 ///     <li>3.6   - IPM installation only (simplified). Fixed installation issues. Fixed pre/post 2024 ReadRawDataStream / GetFieldStreamRaw in ITB.HL7.Format.HL7XMLv2</li>
+///     <li>3.7   - Added a custom HL7 schema loader for ITB.XML to keep schema import working on IRIS for Health / Health Connect 2026.1 without overriding system classes.</li>
 /// </ul>
 Class ITB.Info Extends %RegisteredObject
 {
 
-Parameter VERSION = 3.6;
+Parameter VERSION = 3.7;
 
 Parameter PORTING = 2014;
 
