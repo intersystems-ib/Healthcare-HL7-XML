@@ -129,12 +129,12 @@ Method DeleteEntry(pId As %String) As %String [ ZenMethod ]
 /// Open message viewer for an specific message id
 ClientMethod messageViewerHandler(id) [ Language = javascript ]
 {
-	var url = zenPage.GetMessageViewerURL(id);
+	var url = zenPage.zGetMessageViewerURL(id);
 	window.open(url);
 }
 
 /// Return a URL to MessageViewer to search for an specific message and sets session search criteria as well
-Method GetMessageViewerURL(pId As %String) As %String [ ZenMethod ]
+Method zGetMessageViewerURL(pId As %String) As %String [ ZenMethod ]
 {
 	// build URL
 	set tUrl = "EnsPortal.MessageViewer.zen"
